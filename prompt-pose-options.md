@@ -40,16 +40,54 @@ Do NOT include any of the following:
 - rusty motorcycle parts
 - damaged mechanical components
 - low-quality motorcycle detailing
-- blurry details
 - distorted anatomy
 - extra limbs
 - awkward hands
 - unnatural posture
 - duplicated body parts
-- low-resolution textures
 - oversaturated colors
-- cartoon appearance
-- CGI-looking skin
 - poorly rendered helmet
 - floating objects
 - cluttered background
+
+# Bike Reference URL Notes
+
+## Current Process
+
+The `bikes` table has an `image_url` field.
+Right now, the generation flow may select and carry that bike URL in backend selection data, but the bike image itself is not attached to Gemini as a visual reference during image generation.
+
+Current generation behavior:
+
+1. The backend selects a bike from the database based on quiz mapping, weight distribution, and color preference.
+2. The selected bike model name and resolved bike color are written into the final text prompt.
+3. Gemini receives the user face image as the visual reference input.
+4. Gemini does not currently receive the selected bike image from `image_url` as an attached bike reference.
+
+Because of that, bike matching is currently text-guided, not image-guided.
+
+## If Bike URL Is Attached Later
+
+If the selected bike image from `image_url` is attached as an additional visual reference later, the likely process would be:
+
+1. Select the bike from the database as usual.
+2. Read or download the bike image from `image_url`.
+3. Convert that bike image into a model-ready inline image payload.
+4. Send that bike image together with the user image and the final prompt to Gemini.
+5. Gemini uses:
+   - the user image for face identity
+   - the bike image for bike shape and design reference
+   - the final prompt for pose, environment, styling, and negative prompting
+
+## Expected Time Impact
+
+Yes, attaching the bike image will likely increase generation time somewhat.
+
+Reasons:
+
+- one more image must be fetched or loaded
+- one more image must be encoded and added to the request
+- the model must process additional visual context
+- larger request payloads can increase latency
+
+In return, bike matching accuracy should improve because the bike would be both text-guided and image-guided instead of text-guided only.

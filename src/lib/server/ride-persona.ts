@@ -48,16 +48,15 @@ const FIXED_REALISM_BLOCK = [
 ].join(' ');
 
 const POSE_OPTIONS = [
-  'Standing beside the motorcycle in a full-body pose with both arms crossed over the chest, body angled slightly toward the bike, head turned slightly away from camera, confident and dominant presence.',
-  'Sitting sideways on the motorcycle seat in a relaxed lifestyle pose, one foot planted on the ground, upper body slightly turned toward camera, one hand resting on or holding the helmet naturally.',
-  'Standing next to the motorcycle with one hand adjusting the neck or hoodie collar area while the other hand holds a helmet at the side, calm cinematic hero pose with relaxed confidence.',
-  'Sitting on the motorcycle in an urban editorial pose, torso leaning slightly forward, both forearms resting on a helmet placed near the tank or handlebar area, composed and relaxed expression.',
-  'Walking beside the parked motorcycle while carrying a helmet in one hand, natural mid-step movement, body leaning slightly forward as if arriving or leaving, cinematic travel atmosphere.',
+  'Full-body standing beside the motorcycle, arms crossed, body angled toward the bike, head slightly turned away, confident presence.',
+  'Sitting sideways on the motorcycle seat, one foot on the ground, upper body turned slightly toward camera, one hand resting on or holding the helmet.',
+  'Standing beside the motorcycle, one hand adjusting the collar area, the other holding a helmet, calm cinematic confidence.',
+  'Sitting on the motorcycle, torso slightly forward, both forearms resting on a helmet near the tank or handlebar, relaxed editorial pose.',
+  'Walking beside the parked motorcycle, carrying a helmet in one hand, natural mid-step movement, cinematic travel mood.',
 ] as const;
 
 const NEGATIVE_PROMPT_TERMS = [
   'torn clothing',
-  'ripped shirt',
   'damaged trousers',
   'worn-out shoes',
   'dirty outfit',
@@ -65,9 +64,7 @@ const NEGATIVE_PROMPT_TERMS = [
   'broken accessories',
   'deformed motorcycle',
   'warped motorcycle frame',
-  'unrealistic bike proportions',
   'rusty motorcycle parts',
-  'damaged mechanical components',
   'low-quality motorcycle detailing',
   'blurry details',
   'distorted anatomy',
@@ -75,13 +72,8 @@ const NEGATIVE_PROMPT_TERMS = [
   'awkward hands',
   'unnatural posture',
   'duplicated body parts',
-  'low-resolution textures',
   'oversaturated colors',
-  'cartoon appearance',
-  'CGI-looking skin',
-  'poorly rendered helmet',
   'floating objects',
-  'cluttered background',
 ] as const;
 
 function parseJsonRecord<T>(value: unknown, fallback: T): T {
