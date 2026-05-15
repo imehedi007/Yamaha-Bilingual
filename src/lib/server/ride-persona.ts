@@ -38,7 +38,6 @@ const FIXED_IDENTITY_BLOCK = [
 const FIXED_COMPOSITION_BLOCK = [
   'Use a vertical 3:4 campaign composition.',
   'Show the rider from head to toe with the full motorcycle visible.',
-  'The rider should stand beside or lightly lean on the motorcycle with confident body language.',
   'Keep the face unobstructed and do not place a helmet on the head.',
 ].join(' ');
 
@@ -47,6 +46,43 @@ const FIXED_REALISM_BLOCK = [
   'Preserve realistic Yamaha proportions, real materials, authentic lighting, shadows, and reflections.',
   'No cartoon styling, no illustration look, no distorted limbs, and no duplicate body parts.',
 ].join(' ');
+
+const POSE_OPTIONS = [
+  'Standing beside the motorcycle in a full-body pose with both arms crossed over the chest, body angled slightly toward the bike, head turned slightly away from camera, confident and dominant presence.',
+  'Sitting sideways on the motorcycle seat in a relaxed lifestyle pose, one foot planted on the ground, upper body slightly turned toward camera, one hand resting on or holding the helmet naturally.',
+  'Standing next to the motorcycle with one hand adjusting the neck or hoodie collar area while the other hand holds a helmet at the side, calm cinematic hero pose with relaxed confidence.',
+  'Sitting on the motorcycle in an urban editorial pose, torso leaning slightly forward, both forearms resting on a helmet placed near the tank or handlebar area, composed and relaxed expression.',
+  'Walking beside the parked motorcycle while carrying a helmet in one hand, natural mid-step movement, body leaning slightly forward as if arriving or leaving, cinematic travel atmosphere.',
+] as const;
+
+const NEGATIVE_PROMPT_TERMS = [
+  'torn clothing',
+  'ripped shirt',
+  'damaged trousers',
+  'worn-out shoes',
+  'dirty outfit',
+  'messy wardrobe',
+  'broken accessories',
+  'deformed motorcycle',
+  'warped motorcycle frame',
+  'unrealistic bike proportions',
+  'rusty motorcycle parts',
+  'damaged mechanical components',
+  'low-quality motorcycle detailing',
+  'blurry details',
+  'distorted anatomy',
+  'extra limbs',
+  'awkward hands',
+  'unnatural posture',
+  'duplicated body parts',
+  'low-resolution textures',
+  'oversaturated colors',
+  'cartoon appearance',
+  'CGI-looking skin',
+  'poorly rendered helmet',
+  'floating objects',
+  'cluttered background',
+] as const;
 
 function parseJsonRecord<T>(value: unknown, fallback: T): T {
   if (!value) return fallback;
@@ -110,6 +146,15 @@ function resolveColorMatch(availableColors: string[], aspirationColor: string) {
     matchedColor: availableColors[0],
     hasMatch: false,
   };
+}
+
+function selectRandomPose() {
+  const poseIndex = Math.floor(Math.random() * POSE_OPTIONS.length);
+  return POSE_OPTIONS[poseIndex];
+}
+
+function buildNegativePromptBlock() {
+  return `Negative prompt: ${NEGATIVE_PROMPT_TERMS.join(', ')}.`;
 }
 
 export function parsePersonaPayload(persona: string): PersonaPayload {
@@ -268,15 +313,23 @@ export function buildImagePrompt(args: {
   const destinationScene = args.destinationScene || 'a premium scenic road';
   const destinationMood = args.destinationMood || 'confident, premium, and cinematic';
   const aspiration = args.aspiration || 'signature rider energy';
+  const selectedPose = selectRandomPose();
+  const negativePromptBlock = buildNegativePromptBlock();
 
   return [
     FIXED_IDENTITY_BLOCK,
     FIXED_COMPOSITION_BLOCK,
+    'Randomly select exactly one approved pose and use only that pose in the final image.',
+    'Do not combine poses or mix body positions.',
+    'Maintain natural body mechanics, realistic limb proportions, and balanced posture.',
+    'Keep the pose composition visually similar to the selected reference description.',
+    `Selected pose: ${selectedPose}`,
     `Environment: ${destinationScene}.`,
     `Mood: ${destinationMood}.`,
     `Aspirational tone: ${aspiration}.`,
     `Vehicle: a realistic Yamaha ${args.bikeModel} in ${args.bikeColor}.`,
     'Wardrobe: premium biker streetwear with a polished Yamaha lifestyle aesthetic.',
     FIXED_REALISM_BLOCK,
+    negativePromptBlock,
   ].join(' ');
 }
