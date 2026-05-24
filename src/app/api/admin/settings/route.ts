@@ -52,7 +52,22 @@ export async function PUT(req: Request) {
     if (max_weekly_generations !== undefined) await updateSetting('max_weekly_generations', max_weekly_generations);
     if (max_monthly_generations !== undefined) await updateSetting('max_monthly_generations', max_monthly_generations);
     if (body.otp_enabled !== undefined) await updateSetting('otp_enabled', body.otp_enabled);
-    if (body.eid_camp_enabled !== undefined) await updateSetting('eid_camp_enabled', body.eid_camp_enabled);
+    if (body.eid_camp_enabled !== undefined) {
+      await updateSetting('eid_camp_enabled', body.eid_camp_enabled);
+
+      const isEnabled = body.eid_camp_enabled !== 'false';
+      const enableQuestionId = isEnabled ? 4 : 2;
+      const disableQuestionId = isEnabled ? 2 : 4;
+
+      await query(
+        'UPDATE quiz_options SET is_active = TRUE WHERE question_id = ?',
+        [enableQuestionId]
+      );
+      await query(
+        'UPDATE quiz_options SET is_active = FALSE WHERE question_id = ?',
+        [disableQuestionId]
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
