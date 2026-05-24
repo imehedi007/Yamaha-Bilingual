@@ -91,6 +91,7 @@ async function run() {
     await addColumnIfMissing(pool, 'generations', 'behavior_option_id', 'behavior_option_id INT NULL');
     await addColumnIfMissing(pool, 'generations', 'destination_option_id', 'destination_option_id INT NULL');
     await addColumnIfMissing(pool, 'generations', 'aspiration_option_id', 'aspiration_option_id INT NULL');
+    await addColumnIfMissing(pool, 'generations', 'final_prompt', 'final_prompt LONGTEXT NULL');
     await addColumnIfMissing(pool, 'generations', 'resolved_bike_color', 'resolved_bike_color VARCHAR(255) NULL');
     await addColumnIfMissing(pool, 'generations', 'selection_meta', 'selection_meta JSON NULL');
 

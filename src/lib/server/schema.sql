@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS generations (
     generated_image_url VARCHAR(500) NULL,
     persona_title TEXT NOT NULL,
     traits_summary TEXT,
+    final_prompt LONGTEXT NULL,
     resolved_bike_color VARCHAR(255) NULL,
     selection_meta JSON NULL,
     status ENUM('processing', 'completed', 'failed') DEFAULT 'completed',

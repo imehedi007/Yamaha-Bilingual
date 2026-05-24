@@ -248,6 +248,17 @@ export async function POST(req: Request) {
     });
     console.log('[api/generate] Final image prompt:', finalPrompt);
 
+    await query(
+      `UPDATE generations
+       SET final_prompt = ?
+       WHERE hash_id = ?`,
+      [
+        finalPrompt,
+        hashId,
+      ]
+    );
+    mark('prompt-saved');
+
     // Run both AI tasks concurrently to reduce response latency
     const [personaCopy, generatedImageUrl] = await Promise.all([
       generatePersonaCopy(personaSummary, bikeModel),
