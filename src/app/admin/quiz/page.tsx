@@ -19,6 +19,7 @@ const EMPTY_OPTION = {
   option_desc_bn: '',
   icon_name: '',
   metadata: {},
+  is_active: true,
   bike_mappings: [] as BikeMapping[],
 };
 
@@ -202,6 +203,7 @@ export default function QuizManagerPage() {
       option_desc_bn: option.option_desc_bn || '',
       icon_name: option.icon_name,
       metadata: typeof option.metadata === 'string' ? JSON.parse(option.metadata || '{}') : (option.metadata || {}),
+      is_active: option.is_active !== false && option.is_active !== 0,
       bike_mappings: (option.bike_mappings || []).map((mapping: any, index: number) => ({
         bike_id: mapping.bike_id,
         model_name: mapping.model_name,
@@ -278,6 +280,14 @@ export default function QuizManagerPage() {
               <input placeholder={t.admin.quiz.shortDescription} value={newOption.option_desc} onChange={(e) => setNewOption({ ...newOption, option_desc: e.target.value })} className={styles.input} />
               <input placeholder={t.admin.quiz.shortDescriptionBn} value={newOption.option_desc_bn} onChange={(e) => setNewOption({ ...newOption, option_desc_bn: e.target.value })} className={styles.input} />
               <input placeholder={t.admin.quiz.iconName} value={newOption.icon_name} onChange={(e) => setNewOption({ ...newOption, icon_name: e.target.value })} className={styles.input} style={{ gridColumn: 'span 2' }} />
+              <label style={{ gridColumn: 'span 2', display: 'flex', gap: '10px', alignItems: 'center', fontSize: '13px', color: 'rgba(255,255,255,0.72)' }}>
+                <input
+                  type="checkbox"
+                  checked={newOption.is_active !== false}
+                  onChange={(e) => setNewOption({ ...newOption, is_active: e.target.checked })}
+                />
+                {t.admin.quiz.optionStatus}
+              </label>
 
               {selectedQuestion.question_type === 'behavior' && (
                 <>
@@ -352,11 +362,22 @@ export default function QuizManagerPage() {
           </div>
           <div className={styles.card}>
             <table className={styles.table}>
-              <thead><tr><th>{t.admin.quiz.cols.title}</th><th>{t.admin.quiz.cols.metadata}</th><th>{t.admin.quiz.cols.actions}</th></tr></thead>
+              <thead><tr><th>{t.admin.quiz.cols.title}</th><th>{t.admin.quiz.cols.status}</th><th>{t.admin.quiz.cols.metadata}</th><th>{t.admin.quiz.cols.actions}</th></tr></thead>
               <tbody>
                 {quizOptions.map((option) => (
                   <tr key={option.id}>
                     <td style={{ fontWeight: 600 }}>{option.option_text}<div style={{ color: 'rgba(255,255,255,0.38)', fontSize: '12px', marginTop: '4px' }}>{option.option_text_bn || t.common.notAvailable}</div></td>
+                    <td>
+                      <span
+                        className={styles.badge}
+                        style={{
+                          background: option.is_active ? 'rgba(0, 255, 122, 0.1)' : 'rgba(255, 77, 77, 0.12)',
+                          color: option.is_active ? '#00ff7a' : '#ff8080',
+                        }}
+                      >
+                        {option.is_active ? t.common.enabled : t.common.disabled}
+                      </span>
+                    </td>
                     <td style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>
                       {selectedQuestion.question_type === 'behavior'
                         ? (option.bike_mappings || []).map((mapping: any) => `${mapping.model_name} (${mapping.weight_percent}%)`).join(', ') || t.admin.quiz.none

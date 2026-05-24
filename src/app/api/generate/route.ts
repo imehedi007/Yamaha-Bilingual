@@ -126,10 +126,16 @@ export async function POST(req: Request) {
       const s = settings.find(x => x.setting_key === key);
       return s ? parseInt(s.setting_value, 10) : def;
     };
+    const getBooleanSetting = (key: string, def: boolean) => {
+      const s = settings.find(x => x.setting_key === key);
+      if (!s) return def;
+      return s.setting_value !== 'false';
+    };
     
     const maxDaily = getSetting('max_daily_generations', 10);
     const maxWeekly = getSetting('max_weekly_generations', 50);
     const maxMonthly = getSetting('max_monthly_generations', 100);
+    const isEidCampEnabled = getBooleanSetting('eid_camp_enabled', false);
 
     const [dailyCountRes, weeklyCountRes, monthlyCountRes] = await Promise.all([
       query<any[]>('SELECT COUNT(*) as count FROM generations WHERE user_id = ? AND created_at > NOW() - INTERVAL 1 DAY', [userId]),
@@ -238,6 +244,7 @@ export async function POST(req: Request) {
       destinationMood,
       aspiration: aspirationTone,
       gender: userProfile?.gender || null,
+      isEidCampEnabled,
     });
     console.log('[api/generate] Final image prompt:', finalPrompt);
 

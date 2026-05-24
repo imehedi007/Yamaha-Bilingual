@@ -25,6 +25,7 @@ const optionSchema = z.object({
   option_desc_bn: z.string().optional().default(''),
   icon_name: z.string().optional().default(''),
   metadata: z.record(z.string(), z.any()).optional().default({}),
+  is_active: z.boolean().optional().default(true),
   bike_mappings: z.array(bikeMappingSchema).optional().default([]),
 });
 
@@ -92,7 +93,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid option data' }, { status: 400 });
     }
 
-    const { question_id, option_text, option_text_bn, option_desc, option_desc_bn, icon_name, metadata, bike_mappings } = parsed.data;
+    const { question_id, option_text, option_text_bn, option_desc, option_desc_bn, icon_name, metadata, is_active, bike_mappings } = parsed.data;
     const questions = await query<any[]>('SELECT question_type FROM quiz_questions WHERE id = ?', [question_id]);
     const questionType = questions[0]?.question_type;
 
@@ -104,8 +105,8 @@ export async function POST(req: Request) {
     }
 
     const result = await query<any>(
-      'INSERT INTO quiz_options (question_id, option_text, option_text_bn, option_desc, option_desc_bn, icon_name, metadata) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [question_id, option_text, option_text_bn || null, option_desc, option_desc_bn || null, icon_name, JSON.stringify(metadata || {})]
+      'INSERT INTO quiz_options (question_id, option_text, option_text_bn, option_desc, option_desc_bn, icon_name, metadata, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [question_id, option_text, option_text_bn || null, option_desc, option_desc_bn || null, icon_name, JSON.stringify(metadata || {}), is_active]
     );
 
     const optionId = result.insertId;
@@ -135,7 +136,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: 'Invalid option data' }, { status: 400 });
     }
 
-    const { id, option_text, option_text_bn, option_desc, option_desc_bn, icon_name, metadata, bike_mappings } = parsed.data;
+    const { id, option_text, option_text_bn, option_desc, option_desc_bn, icon_name, metadata, is_active, bike_mappings } = parsed.data;
     const questions = await query<any[]>(
       `SELECT q.question_type
        FROM quiz_options o
@@ -153,8 +154,8 @@ export async function PUT(req: Request) {
     }
 
     await query(
-      'UPDATE quiz_options SET option_text = ?, option_text_bn = ?, option_desc = ?, option_desc_bn = ?, icon_name = ?, metadata = ? WHERE id = ?',
-      [option_text, option_text_bn || null, option_desc, option_desc_bn || null, icon_name, JSON.stringify(metadata || {}), id]
+      'UPDATE quiz_options SET option_text = ?, option_text_bn = ?, option_desc = ?, option_desc_bn = ?, icon_name = ?, metadata = ?, is_active = ? WHERE id = ?',
+      [option_text, option_text_bn || null, option_desc, option_desc_bn || null, icon_name, JSON.stringify(metadata || {}), is_active, id]
     );
 
     if (questionType === 'behavior') {

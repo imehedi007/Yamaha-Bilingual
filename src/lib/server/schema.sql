@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS quiz_options (
     option_desc_bn TEXT NULL,
     icon_name VARCHAR(100),
     metadata JSON NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (question_id) REFERENCES quiz_questions(id) ON DELETE CASCADE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

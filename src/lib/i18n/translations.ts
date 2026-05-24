@@ -239,6 +239,7 @@ export const translations = {
         weight: 'Weight %',
         priority: 'Priority',
         active: 'Active',
+        optionStatus: 'Status (show in quiz)',
         personalitySignal: 'Personality Signal',
         sceneDescription: 'AI Scene Description',
         targetBikeColor: 'Target Bike Color',
@@ -263,6 +264,7 @@ export const translations = {
           type: 'Type',
           actions: 'Actions',
           title: 'Title',
+          status: 'Status',
           metadata: 'Metadata / Logic',
         },
       },
@@ -278,6 +280,10 @@ export const translations = {
         otpEnabled: 'Enabled (Require OTP)',
         otpDisabled: 'Disabled (Bypass OTP)',
         otpHelp: 'If disabled, users can access the quiz immediately after entering their phone number.',
+        eidCampMode: 'Eid Camp Mode',
+        eidCampOn: 'On',
+        eidCampOff: 'Off',
+        eidCampHelp: 'When enabled, wardrobe prompts switch to gender-aware Eid styling. When disabled, the current biker streetwear prompt is used.',
         saveConfigurations: 'Save Configurations',
         saveSuccess: 'Settings saved successfully!',
         saveFailure: 'Failed to save settings.',
@@ -539,6 +545,7 @@ export const translations = {
         weight: 'ওজন %',
         priority: 'অগ্রাধিকার',
         active: 'সক্রিয়',
+        optionStatus: 'স্ট্যাটাস (কুইজে দেখান)',
         personalitySignal: 'পার্সোনালিটি সিগন্যাল',
         sceneDescription: 'AI Scene Description',
         targetBikeColor: 'টার্গেট বাইকের রং',
@@ -563,6 +570,7 @@ export const translations = {
           type: 'টাইপ',
           actions: 'অ্যাকশন',
           title: 'শিরোনাম',
+          status: 'স্ট্যাটাস',
           metadata: 'মেটাডেটা / লজিক',
         },
       },
@@ -578,6 +586,10 @@ export const translations = {
         otpEnabled: 'চালু (OTP প্রয়োজন)',
         otpDisabled: 'বন্ধ (OTP ছাড়াই প্রবেশ)',
         otpHelp: 'বন্ধ থাকলে, ইউজার ফোন নম্বর দেওয়ার পর সরাসরি কুইজে যেতে পারবে।',
+        eidCampMode: 'ঈদ ক্যাম্প মোড',
+        eidCampOn: 'চালু',
+        eidCampOff: 'বন্ধ',
+        eidCampHelp: 'চালু থাকলে gender অনুযায়ী Eid wardrobe prompt ব্যবহার হবে। বন্ধ থাকলে বর্তমান biker streetwear prompt ব্যবহার হবে।',
         saveConfigurations: 'কনফিগারেশন সংরক্ষণ করুন',
         saveSuccess: 'সেটিংস সফলভাবে সংরক্ষণ হয়েছে!',
         saveFailure: 'সেটিংস সংরক্ষণ করা যায়নি।',
@@ -624,4 +636,3 @@ export function resolveLanguage(value: string | null | undefined): Language {
 export function formatTemplate(template: string, vars: Record<string, string | number>) {
   return template.replace(/\{(\w+)\}/g, (_, key: string) => String(vars[key] ?? ''));
 }
-

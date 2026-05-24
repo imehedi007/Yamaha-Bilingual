@@ -243,6 +243,63 @@
   color: white;
 }
 
+.toggleButton {
+  width: 100%;
+  padding: 14px 18px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: white;
+  font-size: 14px;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggleButton:hover {
+  border-color: rgba(255,255,255,0.2);
+  background: #222;
+}
+
+.toggleButtonActive {
+  border-color: rgba(0, 122, 255, 0.4);
+  background: rgba(0, 122, 255, 0.14);
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.08);
+}
+
+.toggleKnob {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.18);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.toggleKnob::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s ease;
+}
+
+.toggleKnobActive {
+  background: #007aff;
+}
+
+.toggleKnobActive::after {
+  transform: translateX(20px);
+}
+
 .editBtn {
   background: rgba(255, 255, 255, 0.05);
   color: white;

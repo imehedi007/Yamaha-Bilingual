@@ -88,6 +88,25 @@ export default function SettingsPage() {
               {t.admin.settings.otpHelp}
             </p>
           </div>
+
+          <div>
+            <label className={styles.statLabel}>{t.admin.settings.eidCampMode}</label>
+            <button
+              type="button"
+              className={`${styles.toggleButton} ${settings.eid_camp_enabled === 'true' ? styles.toggleButtonActive : ''}`}
+              onClick={() => setSettings({
+                ...settings,
+                eid_camp_enabled: settings.eid_camp_enabled === 'true' ? 'false' : 'true'
+              })}
+              aria-pressed={settings.eid_camp_enabled === 'true'}
+            >
+              <span>{settings.eid_camp_enabled === 'true' ? t.admin.settings.eidCampOn : t.admin.settings.eidCampOff}</span>
+              <span className={`${styles.toggleKnob} ${settings.eid_camp_enabled === 'true' ? styles.toggleKnobActive : ''}`} />
+            </button>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', marginTop: '4px' }}>
+              {t.admin.settings.eidCampHelp}
+            </p>
+          </div>
           
           <div style={{ marginTop: '12px' }}>
             <button type="submit" className={styles.primaryBtn}>{t.admin.settings.saveConfigurations}</button>

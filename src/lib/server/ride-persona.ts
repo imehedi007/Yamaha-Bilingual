@@ -171,6 +171,22 @@ function buildGenderGuidance(gender?: string | null) {
   return null;
 }
 
+function buildWardrobePrompt(gender?: string | null, isEidCampEnabled?: boolean) {
+  if (!isEidCampEnabled) {
+    return 'Wardrobe: premium Yamaha-inspired biker streetwear, polished, clean, and well-fitted.';
+  }
+
+  if (gender === 'Female') {
+    return 'Wardrobe: elegant premium Eid fashion with a Yamaha-inspired edge, such as a refined Pakistani dress, polished three-piece set, graceful gown, coordinated trousers or payjama, and clean fashionable sandals; modest, well-fitted, polished, and camera-ready.';
+  }
+
+  if (gender === 'Male') {
+    return 'Wardrobe: premium Eid styling with a Yamaha-inspired biker attitude, such as a tailored punjabi, clean payjama or tapered trousers, and polished sandals or sandal shoes; refined, well-fitted, polished, and camera-ready.';
+  }
+
+  return 'Wardrobe: premium Yamaha-inspired Eid streetwear, polished, clean, modest, and well-fitted.';
+}
+
 export function parsePersonaPayload(persona: string): PersonaPayload {
   const parsed = JSON.parse(persona) as Partial<PersonaPayload>;
   const destinationId = Number(parsed.destination_id);
@@ -324,6 +340,7 @@ export function buildImagePrompt(args: {
   destinationMood: string;
   aspiration: string;
   gender?: string | null;
+  isEidCampEnabled?: boolean;
 }) {
   const destinationScene = args.destinationScene || 'a premium scenic road';
   const destinationMood = args.destinationMood || 'confident, premium, and cinematic';
@@ -332,6 +349,7 @@ export function buildImagePrompt(args: {
   const negativePromptBlock = buildNegativePromptBlock();
   const finalMood = buildFinalMood(destinationMood, aspiration);
   const genderGuidance = buildGenderGuidance(args.gender);
+  const wardrobePrompt = buildWardrobePrompt(args.gender, args.isEidCampEnabled);
 
   return [
     FIXED_IDENTITY_BLOCK,
@@ -344,7 +362,7 @@ export function buildImagePrompt(args: {
     `Vehicle: realistic ${args.bikeModel} in ${args.bikeColor}, with authentic model presence, accurate proportions, clean frame geometry, realistic materials, proper reflections, detailed mechanical parts, and high-quality motorcycle styling.`,
     `Environment: ${destinationScene}.`,
     `Mood: ${finalMood}.`,
-    'Wardrobe: premium Yamaha-inspired biker streetwear, polished, clean, and well-fitted.',
+    wardrobePrompt,
     FIXED_REALISM_BLOCK,
     negativePromptBlock,
   ].join(' ');

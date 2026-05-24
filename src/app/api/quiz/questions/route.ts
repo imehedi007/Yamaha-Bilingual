@@ -19,6 +19,7 @@ export async function GET(req: Request) {
         o.icon_name
       FROM quiz_questions q
       JOIN quiz_options o ON q.id = o.question_id
+      WHERE o.is_active = TRUE
       ORDER BY q.order_index ASC, o.id ASC
     `);
 
