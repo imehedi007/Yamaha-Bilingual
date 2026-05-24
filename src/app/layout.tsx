@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
 import { getServerLanguage } from "@/lib/i18n/server";
+import { DEFAULT_OG_IMAGE, SITE_NAME, getMetadataBase } from "@/lib/seo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,8 +17,38 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Yamaha Ride Personality | AI Experience",
-  description: "Discover your ride persona and get matched with the perfect Yamaha machine using advanced AI.",
+  metadataBase: getMetadataBase(),
+  title: {
+    default: "Yamaha Bangladesh AI Ride Personality Campaign",
+    template: "%s | Yamaha Bangladesh",
+  },
+  description:
+    "Join Yamaha Bangladesh's AI Ride Personality Campaign to discover your rider persona, get matched with a Yamaha bike, and create a shareable cinematic portrait built for riders across Bangladesh.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Yamaha Bangladesh AI Ride Personality Campaign",
+    description:
+      "Discover your Yamaha rider persona, explore your ideal bike match, and generate a cinematic AI portrait designed for Yamaha fans in Bangladesh.",
+    url: "/",
+    siteName: SITE_NAME,
+    locale: "en_BD",
+    type: "website",
+    images: [
+      {
+        url: DEFAULT_OG_IMAGE,
+        alt: "Yamaha Bangladesh AI Ride Personality Campaign",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Yamaha Bangladesh AI Ride Personality Campaign",
+    description:
+      "Find your Yamaha rider persona and create a cinematic AI portrait tailored for Bangladesh's riding community.",
+    images: [DEFAULT_OG_IMAGE],
+  },
 };
 
 export default async function RootLayout({
@@ -29,7 +60,7 @@ export default async function RootLayout({
 
   return (
     <html
-      lang="en"
+      lang={initialLanguage}
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} app-root`}
     >
