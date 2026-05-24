@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/components/i18n/LanguageProvider';
 import styles from './page.module.css';
 
 export default function Home() {
   const router = useRouter();
+  const { language, t } = useLanguage();
   const [step, setStep] = useState<'lead' | 'otp'>('lead');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -26,7 +28,7 @@ export default function Home() {
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone || !dob || !gender || !division) {
-      setError('Please fill in all fields');
+      setError(t.home.fillAllFields);
       return;
     }
 
@@ -37,7 +39,7 @@ export default function Home() {
       const res = await fetch('/api/auth/otp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, dob, gender, division }),
+        body: JSON.stringify({ name, phone, dob, gender, division, lang: language }),
       });
       const data = await res.json();
 
@@ -52,7 +54,7 @@ export default function Home() {
         setError(data.error || 'Failed to send OTP');
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      setError(t.home.networkError);
     } finally {
       setLoading(false);
     }
@@ -61,7 +63,7 @@ export default function Home() {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length !== 4) {
-      setError('OTP must be 4 digits');
+      setError(t.home.invalidOtpLength);
       return;
     }
 
@@ -72,7 +74,7 @@ export default function Home() {
       const res = await fetch('/api/auth/otp/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, dob, gender, division, otp }),
+        body: JSON.stringify({ name, phone, dob, gender, division, otp, lang: language }),
       });
       const data = await res.json();
 
@@ -83,7 +85,7 @@ export default function Home() {
         setError(data.error || 'Invalid OTP');
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      setError(t.home.networkError);
     } finally {
       setLoading(false);
     }
@@ -100,80 +102,73 @@ export default function Home() {
             </p> */}
 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div className={styles.badge}>Powered by AI</div>
-              <h3 className={styles.title}>Unleash Your Ride Personality</h3>
+              <div className={styles.badge}>{t.home.badge}</div>
+              <h3 className={styles.title}>{t.home.title}</h3>
             </div>
 
             {error && <div className={styles.error}>{error}</div>}
 
             <form onSubmit={handleSendOtp}>
               <div className={styles.formGroup}>
-                <label>Full Name</label>
+                <label>{t.home.fullName}</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your name"
+                  placeholder={t.home.placeholderName}
                   required
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Age Range</label>
+                <label>{t.home.ageRange}</label>
                 <select
                   value={dob}
                   onChange={(e) => setDob(e.target.value)}
                   required
                 >
-                  <option value="" disabled>Select your age range</option>
-                  <option value="18-24">18-24</option>
-                  <option value="25-34">25-34</option>
-                  <option value="35-44">35-44</option>
-                  <option value="45-55">45-55</option>
-                  <option value="55+">55+</option>
+                  <option value="" disabled>{t.home.selectAge}</option>
+                  {t.home.ageRanges.map((range) => (
+                    <option key={range} value={range}>{range}</option>
+                  ))}
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label>Phone Number</label>
+                <label>{t.home.phoneNumber}</label>
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="e.g. 017XXXXXXXX"
+                  placeholder={t.home.placeholderPhone}
                   required
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Gender</label>
+                <label>{t.home.gender}</label>
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
                   required
                 >
-                  <option value="" disabled>Select your gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
+                  <option value="" disabled>{t.home.selectGender}</option>
+                  <option value="Male">{t.home.male}</option>
+                  <option value="Female">{t.home.female}</option>
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label>Division</label>
+                <label>{t.home.division}</label>
                 <select
                   value={division}
                   onChange={(e) => setDivision(e.target.value)}
                   required
                 >
-                  <option value="" disabled>Select your division</option>
-                  <option value="Dhaka">Dhaka</option>
-                  <option value="Chattogram">Chattogram</option>
-                  <option value="Rajshahi">Rajshahi</option>
-                  <option value="Khulna">Khulna</option>
-                  <option value="Barishal">Barishal</option>
-                  <option value="Sylhet">Sylhet</option>
-                  <option value="Rangpur">Rangpur</option>
-                  <option value="Mymensingh">Mymensingh</option>
+                  <option value="" disabled>{t.home.selectDivision}</option>
+                  {t.home.divisions.map((divisionOption) => (
+                    <option key={divisionOption} value={divisionOption}>{divisionOption}</option>
+                  ))}
                 </select>
               </div>
               <button type="submit" className="primary-button" disabled={loading}>
-                {loading ? 'Processing...' : 'Continue'}
+                {loading ? t.home.processing : t.home.continueButton}
               </button>
             </form>
           </>
@@ -181,9 +176,9 @@ export default function Home() {
 
         {step === 'otp' && (
           <div className={styles.otpContainer}>
-            <h1 style={{ fontSize: '24px', textAlign: 'center', marginBottom: '8px' }}>Security Check</h1>
+            <h1 style={{ fontSize: '24px', textAlign: 'center', marginBottom: '8px' }}>{t.home.securityTitle}</h1>
             <p className={styles.subtitle} style={{ fontSize: '14px', marginBottom: '32px' }}>
-              Enter the code sent to <b>{phone}</b>
+              {t.home.otpInstructionPrefix} <b>{phone}</b>
             </p>
 
             {error && <div className={styles.error}>{error}</div>}
@@ -201,15 +196,15 @@ export default function Home() {
                 />
               </div>
               <button type="submit" className="primary-button" disabled={loading}>
-                {loading ? 'Verifying...' : 'Verify Identity'}
+                {loading ? t.home.verifying : t.home.verifyIdentity}
               </button>
             </form>
             <div className={styles.otpActions}>
               <button className={styles.resendBtn} onClick={() => setStep('lead')} disabled={loading}>
-                Change Number
+                {t.home.changeNumber}
               </button>
               <button className={styles.resendBtn} onClick={handleSendOtp} disabled={loading} style={{ marginLeft: '16px' }}>
-                Resend OTP
+                {t.home.resendOtp}
               </button>
             </div>
           </div>

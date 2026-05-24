@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/server/mysql';
 import { generateCinematicImage, generatePersonaCopy } from '@/lib/server/gemini';
 import { buildImagePrompt, parsePersonaPayload, selectBikeForPersona } from '@/lib/server/ride-persona';
+import { getApiMessages, getRequestLanguage } from '@/lib/i18n/api';
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
 
@@ -37,11 +38,12 @@ function normalizeRequestId(value: FormDataEntryValue | null) {
 
 export async function GET(req: Request) {
   try {
+    const messages = getApiMessages(await getRequestLanguage(req));
     const { searchParams } = new URL(req.url);
     const requestId = normalizeRequestId(searchParams.get('requestId'));
 
     if (!requestId) {
-      return NextResponse.json({ error: 'Invalid request ID' }, { status: 400 });
+      return NextResponse.json({ error: messages.invalidRequestId }, { status: 400 });
     }
 
     const generation = await getGenerationByHashId(requestId);
@@ -58,12 +60,14 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error('Generate status API error:', error);
-    return NextResponse.json({ error: 'Failed to check generation status.' }, { status: 500 });
+    return NextResponse.json({ error: getApiMessages(await getRequestLanguage(req)).checkGenerationFailed }, { status: 500 });
   }
 }
 
 export async function POST(req: Request) {
   const startedAt = Date.now();
+  const language = await getRequestLanguage(req);
+  const messages = getApiMessages(language);
   const checkpoints: Record<string, number> = {};
   let activeHashId: string | null = null;
   let reservedGeneration = false;
@@ -81,14 +85,14 @@ export async function POST(req: Request) {
     const requestId = normalizeRequestId(formData.get('requestId'));
 
     if (!photo || !persona) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      return NextResponse.json({ error: messages.missingRequiredFields }, { status: 400 });
     }
 
     // Authenticate user
     const cookieStore = await cookies();
     const token = cookieStore.get('user_token')?.value;
     if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: messages.unauthorized }, { status: 401 });
     }
 
     let userId: number;
@@ -98,7 +102,7 @@ export async function POST(req: Request) {
       userId = verified.payload.userId as number;
       mark('auth-verified');
     } catch (err) {
-      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+      return NextResponse.json({ error: messages.invalidSession }, { status: 401 });
     }
 
     if (requestId) {
@@ -135,13 +139,13 @@ export async function POST(req: Request) {
     mark('rate-limit-checked');
 
     if (dailyCountRes[0].count >= maxDaily) {
-      return NextResponse.json({ error: `You have reached the daily limit of ${maxDaily} images. Please try again tomorrow.` }, { status: 429 });
+      return NextResponse.json({ error: messages.dailyLimit.replace('{count}', String(maxDaily)) }, { status: 429 });
     }
     if (weeklyCountRes[0].count >= maxWeekly) {
-      return NextResponse.json({ error: `You have reached the weekly limit of ${maxWeekly} images. Please try again next week.` }, { status: 429 });
+      return NextResponse.json({ error: messages.weeklyLimit.replace('{count}', String(maxWeekly)) }, { status: 429 });
     }
     if (monthlyCountRes[0].count >= maxMonthly) {
-      return NextResponse.json({ error: `You have reached the monthly limit of ${maxMonthly} images. Please try again next month.` }, { status: 429 });
+      return NextResponse.json({ error: messages.monthlyLimit.replace('{count}', String(maxMonthly)) }, { status: 429 });
     }
 
     // Convert photo to base64
@@ -157,7 +161,7 @@ export async function POST(req: Request) {
       mark('persona-parsed');
     } catch (e: any) {
       console.error('Persona parsing error:', e);
-      return NextResponse.json({ error: 'Quiz data is invalid. Please retake the quiz.' }, { status: 400 });
+      return NextResponse.json({ error: messages.quizInvalid }, { status: 400 });
     }
 
     const selection = await selectBikeForPersona(personaData);
@@ -343,16 +347,16 @@ export async function POST(req: Request) {
     });
     
     // Provide granular error messages back to the user
-    let errorMessage = 'Image generation failed. Please try again.';
+    let errorMessage: string = messages.genericGenerationFailed;
     
     if (error.message) {
       const msg = error.message.toLowerCase();
       if (msg.includes('503') || msg.includes('overloaded')) {
-        errorMessage = 'AI servers are currently overloaded. Please try again in a few moments.';
+        errorMessage = messages.aiOverloaded;
       } else if (msg.includes('safety') || msg.includes('blocked') || msg.includes('policy')) {
-        errorMessage = 'The generated image was blocked by AI safety filters. Please try a different photo.';
+        errorMessage = messages.aiSafety;
       } else if (msg.includes('payload') || msg.includes('no image')) {
-        errorMessage = 'The AI model failed to construct the image. Please try a different photo or angle.';
+        errorMessage = messages.aiPayload;
       }
     }
     

@@ -21,9 +21,9 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     await checkAdmin();
-    const { question_text, question_type, order_index } = await req.json();
-    await query('INSERT INTO quiz_questions (question_text, question_type, order_index) VALUES (?, ?, ?)', 
-      [question_text, question_type, order_index || 0]);
+    const { question_text, question_text_bn, question_type, order_index } = await req.json();
+    await query('INSERT INTO quiz_questions (question_text, question_text_bn, question_type, order_index) VALUES (?, ?, ?, ?)', 
+      [question_text, question_text_bn || null, question_type, order_index || 0]);
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Error adding question' }, { status: 500 });
@@ -39,5 +39,25 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Error deleting question' }, { status: 500 });
+  }
+}
+
+export async function PUT(req: Request) {
+  try {
+    await checkAdmin();
+    const { id, question_text, question_text_bn, question_type, order_index } = await req.json();
+
+    if (!id) {
+      return NextResponse.json({ error: 'Question ID is required' }, { status: 400 });
+    }
+
+    await query(
+      'UPDATE quiz_questions SET question_text = ?, question_text_bn = ?, question_type = ?, order_index = ? WHERE id = ?',
+      [question_text, question_text_bn || null, question_type, order_index || 0, id]
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Error updating question' }, { status: 500 });
   }
 }

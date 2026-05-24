@@ -55,7 +55,7 @@
 
 .content {
   flex: 1;
-  padding: 48px;
+  padding: 96px 48px 48px;
   overflow-y: auto;
   max-width: 1400px;
   margin: 0 auto;

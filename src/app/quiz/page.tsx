@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/components/i18n/LanguageProvider';
 import styles from './quiz.module.css';
 
 export default function Quiz() {
   const router = useRouter();
+  const { language, t } = useLanguage();
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<any[]>([]);
@@ -23,7 +25,7 @@ export default function Quiz() {
 
     async function initQuiz() {
       try {
-        const res = await fetch('/api/quiz/questions');
+        const res = await fetch(`/api/quiz/questions?lang=${language}`);
         const data = await res.json();
         if (data.questions) {
           setQuestions(data.questions);
@@ -45,7 +47,7 @@ export default function Quiz() {
     }
 
     initQuiz();
-  }, [router]);
+  }, [router, language]);
 
   // Save state to sessionStorage on every change
   useEffect(() => {
@@ -93,11 +95,11 @@ export default function Quiz() {
           }));
           router.push('/upload');
         } else {
-          alert('Failed to calculate persona. Please try again.');
+          alert(data.error || t.quiz.personaFailed);
           setSubmitting(false);
         }
       } catch (err) {
-        alert('Network error. Please try again.');
+        alert(t.quiz.networkError);
         setSubmitting(false);
       }
     }
@@ -117,7 +119,8 @@ export default function Quiz() {
     return (
       <main className={styles.container}>
         <div style={{ textAlign: 'center', marginTop: '100px' }} className="fade-in">
-          <h2 className={styles.questionTitle}>Loading quiz...</h2>
+          <h2 className={styles.questionTitle}>{t.quiz.loadingQuiz}</h2>
+          {questions.length === 0 && <p style={{ color: 'var(--text-secondary)', marginTop: '12px' }}>{t.quiz.loadFailed}</p>}
           <div className="spinner" style={{ margin: '0 auto' }}></div>
         </div>
       </main>
@@ -128,7 +131,7 @@ export default function Quiz() {
     return (
       <main className={styles.container}>
         <div style={{ textAlign: 'center', marginTop: '100px' }} className="fade-in">
-          <h2 className={styles.questionTitle}>Analyzing your traits...</h2>
+          <h2 className={styles.questionTitle}>{t.quiz.analyzingTraits}</h2>
           <div className="spinner" style={{ margin: '0 auto' }}></div>
         </div>
       </main>
@@ -203,16 +206,16 @@ export default function Quiz() {
       <div className={styles.topNav}>
         <button className={styles.backButton} onClick={handleBack}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-          Back
+          {t.common.back}
         </button>
       </div>
 
       <div className={styles.header}>
         <h1 className={styles.questionTitle}>{question.title}</h1>
-        <p className={styles.subtitle}>Select an option to continue</p>
+        <p className={styles.subtitle}>{t.quiz.subtitle}</p>
 
         <div className={styles.stepIndicator}>
-          Step {currentQ + 1} <span className={styles.stepMuted}>of {questions.length}</span>
+          {t.quiz.step} {currentQ + 1} <span className={styles.stepMuted}>{t.quiz.of} {questions.length}</span>
         </div>
 
         <div className={styles.progressBarContainer}>
@@ -249,7 +252,7 @@ export default function Quiz() {
           onClick={handleNext}
           disabled={!selectedOption}
         >
-          {currentQ < questions.length - 1 ? 'Next' : 'Calculate Persona'}
+          {currentQ < questions.length - 1 ? t.quiz.next : t.quiz.calculatePersona}
         </button>
       </div>
     </main>

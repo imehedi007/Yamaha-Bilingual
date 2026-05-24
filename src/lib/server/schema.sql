@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS bikes (
     model_name VARCHAR(255) NOT NULL,
     type VARCHAR(100) NOT NULL,
     description TEXT,
+    description_bn TEXT NULL,
     image_url VARCHAR(500),
     colors JSON NULL, -- Available color variants for this bike
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -24,6 +25,7 @@ CREATE TABLE IF NOT EXISTS bikes (
 CREATE TABLE IF NOT EXISTS quiz_questions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     question_text TEXT NOT NULL,
+    question_text_bn TEXT NULL,
     question_type ENUM('behavior', 'destination', 'aspiration') NOT NULL,
     order_index INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -33,7 +35,9 @@ CREATE TABLE IF NOT EXISTS quiz_options (
     id INT AUTO_INCREMENT PRIMARY KEY,
     question_id INT NOT NULL,
     option_text VARCHAR(255) NOT NULL,
+    option_text_bn VARCHAR(255) NULL,
     option_desc TEXT,
+    option_desc_bn TEXT NULL,
     icon_name VARCHAR(100),
     metadata JSON NULL,
     FOREIGN KEY (question_id) REFERENCES quiz_questions(id) ON DELETE CASCADE,

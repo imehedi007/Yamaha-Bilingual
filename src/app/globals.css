@@ -151,7 +151,7 @@ input:focus, select:focus, textarea:focus {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 78px 24px 24px;
   position: relative;
   overflow: hidden;
 }
@@ -177,4 +177,10 @@ input:focus, select:focus, textarea:focus {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding-top: 72px;
+  }
 }

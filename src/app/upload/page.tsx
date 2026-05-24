@@ -2,16 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/components/i18n/LanguageProvider';
 import styles from './upload.module.css';
-
-const LOADING_MESSAGES = [
-  "Analyzing facial features...",
-  "Mapping your ride personality...",
-  "Matching with your Yamaha model...",
-  "Crafting cinematic landscape...",
-  "Blending persona with environment...",
-  "Finalizing your cinematic portrait..."
-];
 
 const PENDING_GENERATION_KEY = 'pendingGeneration';
 const UPLOAD_DB_NAME = 'yamaha-upload-state';
@@ -119,6 +111,8 @@ async function clearPendingGeneration(options?: { keepFile?: boolean }) {
 
 export default function Upload() {
   const router = useRouter();
+  const { language, t } = useLanguage();
+  const loadingMessages = t.upload.loadingMessages;
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -216,7 +210,7 @@ export default function Upload() {
     const pendingGeneration = readPendingGeneration();
     if (pendingGeneration && isPendingGenerationExpired(pendingGeneration)) {
       void clearPendingGeneration({ keepFile: true });
-      setError('Your previous generation session expired after waiting too long. Please create again.');
+      setError(t.upload.expiredPrevious);
       setRetryMode(data ? 'retry-current' : 'restart-flow');
     }
 
@@ -230,7 +224,7 @@ export default function Upload() {
     if (!data && !pendingGeneration) {
       router.push('/quiz');
     }
-  }, [router]);
+  }, [router, t.upload.expiredPrevious]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -250,7 +244,7 @@ export default function Upload() {
       };
       window.addEventListener('popstate', handlePopState);
       interval = setInterval(() => {
-        setLoadingStep((prev) => (prev + 1) % LOADING_MESSAGES.length);
+        setLoadingStep((prev) => (prev + 1) % loadingMessages.length);
       }, 3000);
 
       return () => {
@@ -261,7 +255,7 @@ export default function Upload() {
     }
 
     return undefined;
-  }, [loading]);
+  }, [loading, loadingMessages.length]);
 
   useEffect(() => {
     return () => {
@@ -330,21 +324,21 @@ export default function Upload() {
           return;
         }
         if (completedGeneration?.status === 'failed') {
-          await showRetryState('Generation failed. Please try again.', 'retry-current', {
+          await showRetryState(t.upload.generationFailed, 'retry-current', {
             keepFile: true,
           });
           return;
         }
         if (completedGeneration?.status === 'expired') {
           await showRetryState(
-            'Generation took too long, so the old request was cleared. Please create again.',
+            t.upload.requestClearedLong,
             'retry-current',
             { keepFile: true }
           );
           return;
         }
         await showRetryState(
-          'Generation took too long to confirm. The old request was cleared so you can create again.',
+          t.upload.requestConfirmTimeout,
           'retry-current',
           { keepFile: true }
         );
@@ -356,6 +350,7 @@ export default function Upload() {
       formData.append('photo', resizedBlob, 'upload.jpg');
       formData.append('persona', currentQuizData.persona);
       formData.append('requestId', requestId);
+      formData.append('lang', language);
 
       const res = await fetch('/api/generate', {
         method: 'POST',
@@ -376,7 +371,7 @@ export default function Upload() {
         }
 
         if (completedGeneration?.status === 'failed') {
-          await showRetryState('Generation failed. Please try again.', 'retry-current', {
+          await showRetryState(t.upload.generationFailed, 'retry-current', {
             keepFile: true,
           });
           return;
@@ -384,7 +379,7 @@ export default function Upload() {
 
         if (completedGeneration?.status === 'expired') {
           await showRetryState(
-            'Generation took too long, so the old request was cleared. Please create again.',
+            t.upload.requestClearedLong,
             'retry-current',
             { keepFile: true }
           );
@@ -392,7 +387,7 @@ export default function Upload() {
         }
 
         await showRetryState(
-          'Generation took too long to confirm. The old request was cleared so you can create again.',
+          t.upload.requestConfirmTimeout,
           'retry-current',
           { keepFile: true }
         );
@@ -404,7 +399,7 @@ export default function Upload() {
           return;
         }
 
-        await showRetryState(data.error || 'Generation failed', 'retry-current', {
+        await showRetryState(data.error || t.upload.generationFailed, 'retry-current', {
           keepFile: true,
         });
       }
@@ -416,7 +411,7 @@ export default function Upload() {
       }
 
       await showRetryState(
-        'Generation was interrupted. The old request was cleared, and you can create again now.',
+        t.upload.interrupted,
         'retry-current',
         { keepFile: true }
       );
@@ -433,7 +428,7 @@ export default function Upload() {
       if (isPendingGenerationExpired(pendingGeneration)) {
         const restoredFile = await restoreSavedFile();
         await showRetryState(
-          'Your previous generation session expired after 2 minutes. Please create again.',
+          t.upload.expiredTwoMinutes,
           restoredFile && quizData ? 'retry-current' : 'restart-flow',
           { keepFile: true }
         );
@@ -457,7 +452,7 @@ export default function Upload() {
           return;
         }
         if (completedGeneration?.status === 'failed') {
-          await showRetryState('Previous generation failed. Please create again.', 'retry-current', {
+          await showRetryState(t.upload.previousFailed, 'retry-current', {
             keepFile: true,
           });
           return;
@@ -465,7 +460,7 @@ export default function Upload() {
         if (completedGeneration?.status === 'expired') {
           const restoredFile = await restoreSavedFile();
           await showRetryState(
-            'The previous request stayed pending too long, so it was cleared. Please create again.',
+            t.upload.previousPendingTooLong,
             restoredFile && quizData ? 'retry-current' : 'restart-flow',
             { keepFile: true }
           );
@@ -473,7 +468,7 @@ export default function Upload() {
         }
         const restoredFile = await restoreSavedFile();
         await showRetryState(
-          'The previous request could not be confirmed in time, so it was cleared. Please create again.',
+          t.upload.previousConfirmTimeout,
           restoredFile && quizData ? 'retry-current' : 'restart-flow',
           { keepFile: true }
         );
@@ -483,7 +478,7 @@ export default function Upload() {
       const restoredFile = await restoreSavedFile();
       if (!restoredFile || !quizData) {
         await showRetryState(
-          'Previous generation was interrupted. Please restart the flow and upload the image again.',
+          t.upload.previousInterruptedRestart,
           'restart-flow'
         );
         return;
@@ -493,13 +488,13 @@ export default function Upload() {
     };
 
     void resumePendingGeneration();
-  }, [quizData]);
+  }, [quizData, t.upload]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selected = e.target.files[0];
       if (selected.size > 6 * 1024 * 1024) {
-        setError('File size must be less than 6MB');
+        setError(t.upload.fileTooLarge);
         return;
       }
 
@@ -549,7 +544,7 @@ export default function Upload() {
         <div className={styles.loadingContainer}>
           <div className={styles.skeleton}></div>
           <div className={styles.loadingMessage}>
-            <p className={styles.fadeText}>{LOADING_MESSAGES[loadingStep]}</p>
+            <p className={styles.fadeText}>{loadingMessages[loadingStep]}</p>
           </div>
         </div>
       </main>
@@ -559,9 +554,9 @@ export default function Upload() {
   return (
     <main className="page-container">
       <div className={`${styles.container} fade-in`}>
-        <h1 style={{ fontSize: '28px', marginBottom: '8px', fontFamily: 'Outfit' }}>Upload Your Portrait</h1>
+        <h1 style={{ fontSize: '28px', marginBottom: '8px', fontFamily: 'Outfit' }}>{t.upload.title}</h1>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', fontSize: '14px' }}>
-          For the best cinematic match, upload a clear front-facing photo.
+          {t.upload.subtitle}
         </p>
 
         {error && <div style={{ color: '#ff4d4d', marginBottom: '16px', fontSize: '13px', background: 'rgba(255,77,77,0.1)', padding: '8px', borderRadius: '4px' }}>{error}</div>}
@@ -576,13 +571,13 @@ export default function Upload() {
           ) : (
             <div className={styles.uploadText}>
               <span className={styles.icon}>👤</span>
-              <h3 style={{ fontSize: '18px', fontWeight: '500' }}>Tap to select photo</h3>
-              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px' }}>Max 6MB (JPG, PNG)</p>
+              <h3 style={{ fontSize: '18px', fontWeight: '500' }}>{t.upload.tapToSelect}</h3>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px' }}>{t.upload.maxFile}</p>
             </div>
           )}
           {preview && (
             <div className={styles.uploadText} style={{ background: 'rgba(0,0,0,0.5)', padding: '12px', borderRadius: '8px', backdropFilter: 'blur(4px)' }}>
-              <p style={{ fontSize: '14px' }}>Tap to change</p>
+              <p style={{ fontSize: '14px' }}>{t.upload.tapToChange}</p>
             </div>
           )}
         </div>
@@ -601,7 +596,7 @@ export default function Upload() {
           onClick={handleGenerate}
           style={{ marginTop: '16px' }}
         >
-          Generate My Persona
+          {t.upload.generateButton}
         </button>
 
         {retryMode !== 'hidden' && (
@@ -610,7 +605,7 @@ export default function Upload() {
             onClick={handleCreateAgain}
             style={{ marginTop: '12px' }}
           >
-            Create Again
+            {t.upload.createAgain}
           </button>
         )}
       </div>

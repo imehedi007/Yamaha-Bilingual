@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
+import { LanguageProvider } from "@/components/i18n/LanguageProvider";
+import { getServerLanguage } from "@/lib/i18n/server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,18 +20,25 @@ export const metadata: Metadata = {
   description: "Discover your ride persona and get matched with the perfect Yamaha machine using advanced AI.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialLanguage = await getServerLanguage();
+
   return (
     <html
       lang="en"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} app-root`}
     >
-      <body className="app-body">{children}</body>
+      <body className="app-body">
+        <LanguageProvider initialLanguage={initialLanguage}>
+          <LanguageSwitcher />
+          {children}
+        </LanguageProvider>
+      </body>
     </html>
   );
 }

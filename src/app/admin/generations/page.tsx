@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { formatTemplate } from '@/lib/i18n/translations';
+import { useLanguage } from '@/components/i18n/LanguageProvider';
 import styles from '../admin.module.css';
 
 export default function GenerationsPage() {
+  const { t } = useLanguage();
   const [generations, setGenerations] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -36,7 +39,7 @@ export default function GenerationsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm('Are you sure you want to delete this record?')) {
+    if (confirm(t.admin.generations.deleteConfirm)) {
       await fetch(`/api/admin/generations?id=${id}`, { method: 'DELETE' });
       fetchGenerations();
     }
@@ -68,15 +71,15 @@ export default function GenerationsPage() {
   return (
     <div className="fade-in">
       <div className={styles.header}>
-        <h1>AI Generations History</h1>
+        <h1>{t.admin.generations.title}</h1>
         <div style={{ display: 'flex', gap: '12px' }}>
           <select value={limit} onChange={e => { setLimit(parseInt(e.target.value)); setPage(1); }} className={styles.select} style={{ width: 'auto' }}>
-            <option value="20">20 per page</option>
-            <option value="40">40 per page</option>
-            <option value="60">60 per page</option>
+            <option value="20">20 {t.admin.generations.perPage}</option>
+            <option value="40">40 {t.admin.generations.perPage}</option>
+            <option value="60">60 {t.admin.generations.perPage}</option>
           </select>
           <button className={styles.secondaryBtn} onClick={handleExport}>
-            Export {selectedIds.length > 0 ? `Selected (${selectedIds.length})` : 'All'} CSV
+            {selectedIds.length > 0 ? `${t.admin.generations.exportSelected} (${selectedIds.length})` : t.admin.generations.exportAll}
           </button>
         </div>
       </div>
@@ -88,20 +91,20 @@ export default function GenerationsPage() {
               <th style={{ width: '40px' }}>
                 <input type="checkbox" checked={selectedIds.length === generations.length && generations.length > 0} onChange={toggleSelectAll} />
               </th>
-              <th>Image</th>
-              <th>User</th>
-              <th>Phone</th>
-              <th>Gender</th>
-              <th>Division</th>
-              <th>Bike</th>
-              <th>Color</th>
-              <th>Date</th>
-              <th>Actions</th>
+              <th>{t.admin.generations.cols.image}</th>
+              <th>{t.admin.generations.cols.user}</th>
+              <th>{t.admin.generations.cols.phone}</th>
+              <th>{t.admin.generations.cols.gender}</th>
+              <th>{t.admin.generations.cols.division}</th>
+              <th>{t.admin.generations.cols.bike}</th>
+              <th>{t.admin.generations.cols.color}</th>
+              <th>{t.admin.generations.cols.date}</th>
+              <th>{t.admin.generations.cols.actions}</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={10} style={{ textAlign: 'center', padding: '40px' }}>Loading...</td></tr>
+              <tr><td colSpan={10} style={{ textAlign: 'center', padding: '40px' }}>{t.admin.generations.loading}</td></tr>
             ) : (
               generations.map(gen => (
                 <tr key={gen.id} className={selectedIds.includes(gen.id) ? styles.rowSelected : ''}>
@@ -134,7 +137,7 @@ export default function GenerationsPage() {
                     {new Date(gen.created_at).toLocaleString()}
                   </td>
                   <td>
-                    <button onClick={() => handleDelete(gen.id)} className={styles.dangerBtn} style={{ padding: '4px 8px', fontSize: '10px' }}>Delete</button>
+                    <button onClick={() => handleDelete(gen.id)} className={styles.dangerBtn} style={{ padding: '4px 8px', fontSize: '10px' }}>{t.common.delete}</button>
                   </td>
                 </tr>
               ))
@@ -143,9 +146,9 @@ export default function GenerationsPage() {
         </table>
 
         <div className={styles.pagination}>
-          <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className={styles.secondaryBtn}>Previous</button>
-          <span>Page {page} of {totalPages || 1} ({total} total)</span>
-          <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className={styles.secondaryBtn}>Next</button>
+          <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className={styles.secondaryBtn}>{t.admin.generations.previous}</button>
+          <span>{formatTemplate(t.admin.generations.pageOf, { page, totalPages: totalPages || 1, total })}</span>
+          <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className={styles.secondaryBtn}>{t.admin.generations.next}</button>
         </div>
       </div>
     </div>

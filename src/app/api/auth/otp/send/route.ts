@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/server/mysql';
 import { sendSMS } from '@/lib/server/bulksmsbd';
+import { getApiMessages, getRequestLanguage } from '@/lib/i18n/api';
 import { z } from 'zod';
 import { cookies } from 'next/headers';
 import { SignJWT } from 'jose';
@@ -11,15 +12,17 @@ const sendOtpSchema = z.object({
   dob: z.string().optional(),
   gender: z.enum(['Male', 'Female']),
   division: z.enum(['Dhaka', 'Chattogram', 'Rajshahi', 'Khulna', 'Barishal', 'Sylhet', 'Rangpur', 'Mymensingh']),
+  lang: z.enum(['en', 'bn']).optional(),
 });
 
 export async function POST(req: Request) {
   try {
+    const messages = getApiMessages(await getRequestLanguage(req));
     const body = await req.json();
     const result = sendOtpSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 });
+      return NextResponse.json({ error: messages.invalidPhone }, { status: 400 });
     }
 
     const { name, phone, dob, gender, division } = result.data;
@@ -35,7 +38,7 @@ export async function POST(req: Request) {
 
       if (users.length === 0) {
         if (!name) {
-          return NextResponse.json({ error: 'Name is required for new users' }, { status: 400 });
+          return NextResponse.json({ error: messages.nameRequired }, { status: 400 });
         }
         const insertResult = await query<any>(
           `INSERT INTO users (name, phone, dob, gender, division) VALUES (?, ?, ?, ?, ?)`,
@@ -96,7 +99,7 @@ export async function POST(req: Request) {
     );
 
     if (recentOtps.length > 0) {
-      return NextResponse.json({ error: 'Please wait before requesting another OTP' }, { status: 429 });
+      return NextResponse.json({ error: messages.otpWait }, { status: 429 });
     }
 
     // Generate 4 digit OTP
@@ -114,12 +117,12 @@ export async function POST(req: Request) {
     const smsSent = await sendSMS(phone, message);
 
     if (!smsSent) {
-      return NextResponse.json({ error: 'Failed to send OTP SMS' }, { status: 500 });
+      return NextResponse.json({ error: messages.otpSendFailed }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, message: 'OTP sent successfully' });
+    return NextResponse.json({ success: true, message: messages.otpSent });
   } catch (error) {
     console.error('Send OTP error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: getApiMessages(await getRequestLanguage(req)).internalError }, { status: 500 });
   }
 }

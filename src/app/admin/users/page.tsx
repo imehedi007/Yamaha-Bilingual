@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useLanguage } from '@/components/i18n/LanguageProvider';
+import { formatTemplate } from '@/lib/i18n/translations';
 import styles from '../admin.module.css';
 
 export default function UsersPage() {
+  const { t } = useLanguage();
   const [users, setUsers] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -74,7 +77,7 @@ export default function UsersPage() {
   };
 
   const handleDeleteGen = async (id: number) => {
-    if (confirm('Delete this generation?')) {
+    if (confirm(t.admin.users.deleteGenerationConfirm)) {
       await fetch(`/api/admin/generations?id=${id}`, { method: 'DELETE' });
       const res = await fetch(`/api/admin/generations/user?userId=${selectedUser.id}`);
       const data = await res.json();
@@ -95,20 +98,20 @@ export default function UsersPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
                 <h2 style={{ fontSize: '26px', fontWeight: 700, letterSpacing: '-0.5px' }}>{selectedUser.name}</h2>
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', marginTop: '4px' }}>Member since {new Date(selectedUser.created_at).toLocaleDateString()}</p>
+                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', marginTop: '4px' }}>{t.admin.users.memberSince} {new Date(selectedUser.created_at).toLocaleDateString()}</p>
               </div>
               <div style={{ textAlign: 'right', marginRight: '48px' }}>
                 <div style={{ fontSize: '20px', fontWeight: 600, color: '#007aff' }}>{selectedUser.phone}</div>
-                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>{selectedUser.dob || 'Age Range N/A'}</div>
-                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>{selectedUser.gender || 'Gender N/A'}</div>
-                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>{selectedUser.division || 'Division N/A'}</div>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>{selectedUser.dob || t.common.notAvailable}</div>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>{selectedUser.gender || t.common.notAvailable}</div>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>{selectedUser.division || t.common.notAvailable}</div>
               </div>
             </div>
           </div>
 
           <div className={styles.modalBody}>
             <h3 style={{ fontSize: '15px', fontWeight: 600, marginBottom: '20px', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-              Generation History ({userGenerations.length})
+              {t.admin.users.generationHistory} ({userGenerations.length})
             </h3>
             
             <div className={styles.genGrid} style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px' }}>
@@ -126,7 +129,7 @@ export default function UsersPage() {
                   </a>
                   <div style={{ padding: '12px', fontSize: '11px' }}>
                     <div style={{ fontWeight: 600, color: 'white', marginBottom: '4px' }}>{gen.bike_model}</div>
-                    <div style={{ color: 'rgba(255,255,255,0.55)', marginBottom: '4px' }}>{gen.resolved_bike_color || 'Color N/A'}</div>
+                    <div style={{ color: 'rgba(255,255,255,0.55)', marginBottom: '4px' }}>{gen.resolved_bike_color || t.common.notAvailable}</div>
                     <div style={{ color: 'rgba(255,255,255,0.4)' }}>{new Date(gen.created_at).toLocaleDateString()}</div>
                   </div>
                   <button 
@@ -140,7 +143,7 @@ export default function UsersPage() {
               ))}
               {userGenerations.length === 0 && !loading && (
                 <div style={{ color: 'rgba(255,255,255,0.1)', textAlign: 'center', gridColumn: 'span 12', padding: '60px' }}>
-                  No activity recorded for this user yet.
+                  {t.admin.users.noActivity}
                 </div>
               )}
             </div>
@@ -153,15 +156,15 @@ export default function UsersPage() {
   return (
     <div className="fade-in">
       <div className={styles.header}>
-        <h1>Users Management</h1>
+        <h1>{t.admin.users.title}</h1>
         <div style={{ display: 'flex', gap: '12px' }}>
           <select value={limit} onChange={e => { setLimit(parseInt(e.target.value)); setPage(1); }} className={styles.select} style={{ width: 'auto' }}>
-            <option value="20">20 per page</option>
-            <option value="40">40 per page</option>
-            <option value="60">60 per page</option>
+            <option value="20">20 {t.admin.users.perPage}</option>
+            <option value="40">40 {t.admin.users.perPage}</option>
+            <option value="60">60 {t.admin.users.perPage}</option>
           </select>
           <button className={styles.secondaryBtn} onClick={handleExport}>
-            Export {selectedIds.length > 0 ? `Selected (${selectedIds.length})` : 'All'} CSV
+            {selectedIds.length > 0 ? `${t.admin.users.exportSelected} (${selectedIds.length})` : t.admin.users.exportAll}
           </button>
         </div>
       </div>
@@ -173,20 +176,20 @@ export default function UsersPage() {
               <th style={{ width: '40px' }}>
                 <input type="checkbox" checked={selectedIds.length === users.length && users.length > 0} onChange={toggleSelectAll} />
               </th>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Age Range</th>
-              <th>Gender</th>
-              <th>Division</th>
-              <th>Gens</th>
-              <th>Joined</th>
-              <th>Actions</th>
+              <th>{t.admin.users.cols.id}</th>
+              <th>{t.admin.users.cols.name}</th>
+              <th>{t.admin.users.cols.phone}</th>
+              <th>{t.admin.users.cols.ageRange}</th>
+              <th>{t.admin.users.cols.gender}</th>
+              <th>{t.admin.users.cols.division}</th>
+              <th>{t.admin.users.cols.gens}</th>
+              <th>{t.admin.users.cols.joined}</th>
+              <th>{t.admin.users.cols.actions}</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={10} style={{ textAlign: 'center', padding: '40px' }}>Loading...</td></tr>
+              <tr><td colSpan={10} style={{ textAlign: 'center', padding: '40px' }}>{t.admin.users.loading}</td></tr>
             ) : (
               users.map(u => (
                 <tr key={u.id} className={selectedIds.includes(u.id) ? styles.rowSelected : ''}>
@@ -196,13 +199,13 @@ export default function UsersPage() {
                   <td>{u.id}</td>
                   <td style={{ fontWeight: 600 }}>{u.name}</td>
                   <td>{u.phone}</td>
-                  <td>{u.dob || 'N/A'}</td>
-                  <td>{u.gender || 'N/A'}</td>
-                  <td>{u.division || 'N/A'}</td>
+                  <td>{u.dob || t.common.notAvailable}</td>
+                  <td>{u.gender || t.common.notAvailable}</td>
+                  <td>{u.division || t.common.notAvailable}</td>
                   <td>{u.total_generations}</td>
                   <td>{new Date(u.created_at).toLocaleDateString()}</td>
                   <td>
-                    <button onClick={() => setSelectedUser(u)} className={styles.editBtn}>View Details</button>
+                    <button onClick={() => setSelectedUser(u)} className={styles.editBtn}>{t.admin.users.viewDetails}</button>
                   </td>
                 </tr>
               ))
@@ -211,9 +214,9 @@ export default function UsersPage() {
         </table>
 
         <div className={styles.pagination}>
-          <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className={styles.secondaryBtn}>Previous</button>
-          <span>Page {page} of {totalPages || 1} ({total} total)</span>
-          <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className={styles.secondaryBtn}>Next</button>
+          <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className={styles.secondaryBtn}>{t.admin.users.previous}</button>
+          <span>{formatTemplate(t.admin.users.pageOf, { page, totalPages: totalPages || 1, total })}</span>
+          <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className={styles.secondaryBtn}>{t.admin.users.next}</button>
         </div>
       </div>
 

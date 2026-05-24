@@ -79,6 +79,10 @@ async function runMigration() {
     await addColumnIfMissing(pool, 'option_bike_mappings', 'weight_percent', 'weight_percent INT NOT NULL DEFAULT 0');
     await addColumnIfMissing(pool, 'option_bike_mappings', 'priority_order', 'priority_order INT NOT NULL DEFAULT 0');
     await addColumnIfMissing(pool, 'option_bike_mappings', 'is_active', 'is_active BOOLEAN DEFAULT TRUE');
+    await addColumnIfMissing(pool, 'quiz_questions', 'question_text_bn', 'question_text_bn TEXT NULL');
+    await addColumnIfMissing(pool, 'quiz_options', 'option_text_bn', 'option_text_bn VARCHAR(255) NULL');
+    await addColumnIfMissing(pool, 'quiz_options', 'option_desc_bn', 'option_desc_bn TEXT NULL');
+    await addColumnIfMissing(pool, 'bikes', 'description_bn', 'description_bn TEXT NULL');
     await addColumnIfMissing(pool, 'generations', 'behavior_option_id', 'behavior_option_id INT NULL');
     await addColumnIfMissing(pool, 'generations', 'destination_option_id', 'destination_option_id INT NULL');
     await addColumnIfMissing(pool, 'generations', 'aspiration_option_id', 'aspiration_option_id INT NULL');

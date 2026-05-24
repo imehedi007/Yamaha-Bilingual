@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/server/mysql';
+import { getApiMessages, getRequestLanguage } from '@/lib/i18n/api';
 import { z } from 'zod';
 import { cookies } from 'next/headers';
 import { SignJWT } from 'jose';
@@ -10,16 +11,18 @@ const verifyOtpSchema = z.object({
   dob: z.string().optional(),
   gender: z.enum(['Male', 'Female']),
   division: z.enum(['Dhaka', 'Chattogram', 'Rajshahi', 'Khulna', 'Barishal', 'Sylhet', 'Rangpur', 'Mymensingh']),
-  otp: z.string().length(4)
+  otp: z.string().length(4),
+  lang: z.enum(['en', 'bn']).optional(),
 });
 
 export async function POST(req: Request) {
   try {
+    const messages = getApiMessages(await getRequestLanguage(req));
     const body = await req.json();
     const result = verifyOtpSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
+      return NextResponse.json({ error: messages.invalidInput }, { status: 400 });
     }
 
     const { name, phone, dob, gender, division, otp } = result.data;
@@ -33,7 +36,7 @@ export async function POST(req: Request) {
     );
 
     if (otps.length === 0) {
-      return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 400 });
+      return NextResponse.json({ error: messages.invalidOtp }, { status: 400 });
     }
 
     // Mark OTP as used
@@ -45,7 +48,7 @@ export async function POST(req: Request) {
 
     if (users.length === 0) {
       if (!name) {
-        return NextResponse.json({ error: 'Name is required for new users' }, { status: 400 });
+        return NextResponse.json({ error: messages.nameRequired }, { status: 400 });
       }
       const insertResult = await query<any>(
         `INSERT INTO users (name, phone, dob, gender, division) VALUES (?, ?, ?, ?, ?)`,
@@ -101,6 +104,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, userId });
   } catch (error) {
     console.error('Verify OTP error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: getApiMessages(await getRequestLanguage(req)).internalError }, { status: 500 });
   }
 }

@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useLanguage } from '@/components/i18n/LanguageProvider';
 import styles from './admin.module.css';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,18 +25,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     });
   }, [router, pathname]);
 
-  if (loading) return <div style={{ padding: '80px', color: 'white', textAlign: 'center' }}>Verifying authorization...</div>;
+  if (loading) return <div style={{ padding: '80px', color: 'white', textAlign: 'center' }}>{t.admin.verifying}</div>;
 
   // Don't show sidebar/layout on login page
   if (pathname === '/admin/login') return <>{children}</>;
 
   const navItems = [
-    { label: 'Overview', path: '/admin', tab: 'overview' },
-    { label: 'Users', path: '/admin/users', tab: 'users' },
-    { label: 'Generations', path: '/admin/generations', tab: 'generations' },
-    { label: 'Bikes', path: '/admin/bikes', tab: 'bikes' },
-    { label: 'Quiz Manager', path: '/admin/quiz', tab: 'quiz' },
-    { label: 'Settings', path: '/admin/settings', tab: 'settings' },
+    { label: t.admin.nav.overview, path: '/admin', tab: 'overview' },
+    { label: t.admin.nav.users, path: '/admin/users', tab: 'users' },
+    { label: t.admin.nav.generations, path: '/admin/generations', tab: 'generations' },
+    { label: t.admin.nav.bikes, path: '/admin/bikes', tab: 'bikes' },
+    { label: t.admin.nav.quiz, path: '/admin/quiz', tab: 'quiz' },
+    { label: t.admin.nav.settings, path: '/admin/settings', tab: 'settings' },
   ];
 
   return (
@@ -42,7 +44,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className={styles.sidebar}>
         <div className={styles.brand}>
           <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#007aff' }}></div>
-          Yamaha Admin
+          {t.admin.brand}
         </div>
         <nav style={{ flex: 1 }}>
           {navItems.map(item => (
@@ -64,7 +66,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           className={styles.navItem}
           style={{ marginTop: 'auto', border: 'none', background: 'transparent', width: '100%', textAlign: 'left', cursor: 'pointer', color: '#ff4d4d' }}
         >
-          Logout
+          {t.admin.nav.logout}
         </button>
       </div>
 

@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLanguage } from '@/components/i18n/LanguageProvider';
 import styles from '../admin.module.css';
 
 export default function SettingsPage() {
+  const { t } = useLanguage();
   const [settings, setSettings] = useState<any>({});
   const [loading, setLoading] = useState(true);
 
@@ -22,27 +24,27 @@ export default function SettingsPage() {
       method: 'PUT', 
       body: JSON.stringify(settings) 
     });
-    if (res.ok) alert('Settings saved successfully!');
-    else alert('Failed to save settings.');
+    if (res.ok) alert(t.admin.settings.saveSuccess);
+    else alert(t.admin.settings.saveFailure);
   };
 
-  if (loading) return <div style={{ padding: '40px', color: 'white' }}>Loading settings...</div>;
+  if (loading) return <div style={{ padding: '40px', color: 'white' }}>{t.admin.settings.loading}</div>;
 
   return (
     <div className="fade-in">
       <div className={styles.header}>
-        <h1>System Settings</h1>
+        <h1>{t.admin.settings.title}</h1>
       </div>
 
       <div className={styles.card} style={{ maxWidth: '600px' }}>
-        <h2 style={{ marginBottom: '24px', fontSize: '18px' }}>Generation Limits</h2>
+        <h2 style={{ marginBottom: '24px', fontSize: '18px' }}>{t.admin.settings.generationLimits}</h2>
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', marginBottom: '32px' }}>
-          Configure how many AI generations each user is allowed to perform within specific timeframes.
+          {t.admin.settings.generationLimitsHelp}
         </p>
         
         <form onSubmit={handleSaveSettings} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div>
-            <label className={styles.statLabel}>Daily Limit (per user)</label>
+            <label className={styles.statLabel}>{t.admin.settings.dailyLimit}</label>
             <input 
               type="number" 
               value={settings.max_daily_generations || ''} 
@@ -52,7 +54,7 @@ export default function SettingsPage() {
             />
           </div>
           <div>
-            <label className={styles.statLabel}>Weekly Limit (per user)</label>
+            <label className={styles.statLabel}>{t.admin.settings.weeklyLimit}</label>
             <input 
               type="number" 
               value={settings.max_weekly_generations || ''} 
@@ -62,7 +64,7 @@ export default function SettingsPage() {
             />
           </div>
           <div>
-            <label className={styles.statLabel}>Monthly Limit (per user)</label>
+            <label className={styles.statLabel}>{t.admin.settings.monthlyLimit}</label>
             <input 
               type="number" 
               value={settings.max_monthly_generations || ''} 
@@ -73,33 +75,33 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className={styles.statLabel}>Require OTP Verification</label>
+            <label className={styles.statLabel}>{t.admin.settings.requireOtp}</label>
             <select 
               value={settings.otp_enabled || 'true'} 
               onChange={e => setSettings({ ...settings, otp_enabled: e.target.value })} 
               className={styles.input} 
             >
-              <option value="true">Enabled (Require OTP)</option>
-              <option value="false">Disabled (Bypass OTP)</option>
+              <option value="true">{t.admin.settings.otpEnabled}</option>
+              <option value="false">{t.admin.settings.otpDisabled}</option>
             </select>
             <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', marginTop: '4px' }}>
-              If disabled, users can access the quiz immediately after entering their phone number.
+              {t.admin.settings.otpHelp}
             </p>
           </div>
           
           <div style={{ marginTop: '12px' }}>
-            <button type="submit" className={styles.primaryBtn}>Save Configurations</button>
+            <button type="submit" className={styles.primaryBtn}>{t.admin.settings.saveConfigurations}</button>
           </div>
         </form>
       </div>
 
       <div className={styles.card} style={{ maxWidth: '600px', border: '1px solid rgba(255, 77, 77, 0.2)' }}>
-        <h2 style={{ marginBottom: '12px', fontSize: '18px', color: '#ff4d4d' }}>Danger Zone</h2>
+        <h2 style={{ marginBottom: '12px', fontSize: '18px', color: '#ff4d4d' }}>{t.admin.settings.dangerTitle}</h2>
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', marginBottom: '20px' }}>
-          Be careful with these settings. They affect the entire system security and data integrity.
+          {t.admin.settings.dangerHelp}
         </p>
-        <button className={styles.dangerBtn} onClick={() => alert('Logout is handled via the sidebar (coming soon)')}>
-          Revoke All Sessions
+        <button className={styles.dangerBtn} onClick={() => alert(t.admin.settings.revokeInfo)}>
+          {t.admin.settings.revokeAllSessions}
         </button>
       </div>
     </div>
