@@ -99,3 +99,64 @@
 }
  GET /api/generate?requestId=e95961c9fc4743fea168a7b7707b0f9b 200 in 9ms (next.js: 3ms, application-code: 6ms)
  GET /result/e95961c9fc4743fea168a7b7707b0f9b 200 in 677ms (next.js: 621ms, application-code: 56ms)
+ GET / 200 in 256ms (next.js: 173ms, application-code: 82ms)
+ POST /api/auth/otp/send 200 in 201ms (next.js: 106ms, application-code: 95ms)
+ GET /quiz 200 in 53ms (next.js: 41ms, application-code: 12ms)
+ GET /api/quiz/questions?lang=en 200 in 95ms (next.js: 56ms, application-code: 39ms)
+ GET /api/quiz/questions?lang=en 200 in 12ms (next.js: 3ms, application-code: 9ms)
+ POST /api/quiz/submit 200 in 60ms (next.js: 47ms, application-code: 13ms)
+ GET /upload 200 in 22ms (next.js: 5ms, application-code: 17ms)
+ GET /api/generate?requestId=c0bc5afebf924bc791e6d8948715c926 200 in 25ms (next.js: 15ms, application-code: 10ms)
+[api/generate] form-data-parsed at 7ms
+[api/generate] auth-verified at 10ms
+[api/generate] rate-limit-checked at 22ms
+[api/generate] photo-encoded at 23ms
+[api/generate] persona-parsed at 24ms
+[api/generate] bike-selected at 30ms
+[api/generate] user-profile-loaded at 32ms
+[api/generate] generation-reserved at 40ms
+[api/generate] Generating persona copy and image in parallel...
+[generateCinematicImage] starting request {
+  model: 'gemini-3.1-flash-image-preview',
+  mimeType: 'image/jpeg',
+  promptLength: 2383,
+  referenceImageCopies: 3,
+  referenceImageReason: 'intentional face-match boost',
+  base64Chars: 200956,
+  approxInputBytes: 150717
+}
+[generateCinematicImage] completed {
+  attempt: 1,
+  attemptMs: 45934,
+  totalMs: 45937,
+  outputMimeType: 'image/jpeg',
+  outputBase64Chars: 999444
+}
+[api/generate] ai-complete at 45988ms
+[api/generate] Uploading to S3...
+[api/generate] s3-uploaded at 46957ms
+[api/generate] Saving to database...
+[api/generate] db-saved at 46967ms
+[api/generate] cookie-cleared at 46967ms
+[api/generate] completed {
+  totalMs: 46967,
+  checkpoints: {
+    'form-data-parsed': 7,
+    'auth-verified': 10,
+    'rate-limit-checked': 22,
+    'photo-encoded': 23,
+    'persona-parsed': 24,
+    'bike-selected': 30,
+    'user-profile-loaded': 32,
+    'generation-reserved': 40,
+    'ai-complete': 45988,
+    's3-uploaded': 46957,
+    'db-saved': 46967,
+    'cookie-cleared': 46967
+  },
+  uploadedPhotoBytes: 150715,
+  encodedPhotoBase64Chars: 200956,
+  generatedImageBase64Chars: 999467
+}
+ POST /api/generate 200 in 47s (next.js: 2ms, application-code: 47s)
+ GET /result/c0bc5afebf924bc791e6d8948715c926 200 in 60ms (next.js: 20ms, application-code: 41ms)

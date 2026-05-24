@@ -180,6 +180,15 @@ export async function POST(req: Request) {
     const destinationScene = personaData.destination_meta?.scene || personaData.destination || 'premium scenic road';
     const destinationMood = personaData.destination_meta?.personality || `${personaData.destination} rider energy`;
     const aspirationTone = personaData.aspiration || 'signature rider energy';
+    const finalPrompt = buildImagePrompt({
+      bikeModel,
+      bikeColor,
+      destinationScene,
+      destinationMood,
+      aspiration: aspirationTone,
+      gender: userProfile?.gender || null,
+      isEidCampEnabled,
+    });
 
     const crypto = await import('crypto');
     const hashId = requestId || crypto.randomBytes(16).toString('hex');
@@ -196,11 +205,12 @@ export async function POST(req: Request) {
           generated_image_url,
           persona_title,
           traits_summary,
+          final_prompt,
           resolved_bike_color,
           selection_meta,
           hash_id,
           status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           userId,
           bikeId,
@@ -210,6 +220,7 @@ export async function POST(req: Request) {
           null,
           persona,
           null,
+          finalPrompt,
           bikeColor,
           JSON.stringify(selection.selectionMeta),
           hashId,
@@ -236,28 +247,6 @@ export async function POST(req: Request) {
 
     console.log('[api/generate] Generating persona copy and image in parallel...');
     const personaSummary = `${destinationMood} with ${aspirationTone.toLowerCase()}`;
-    
-    const finalPrompt = buildImagePrompt({
-      bikeModel,
-      bikeColor,
-      destinationScene,
-      destinationMood,
-      aspiration: aspirationTone,
-      gender: userProfile?.gender || null,
-      isEidCampEnabled,
-    });
-    console.log('[api/generate] Final image prompt:', finalPrompt);
-
-    await query(
-      `UPDATE generations
-       SET final_prompt = ?
-       WHERE hash_id = ?`,
-      [
-        finalPrompt,
-        hashId,
-      ]
-    );
-    mark('prompt-saved');
 
     // Run both AI tasks concurrently to reduce response latency
     const [personaCopy, generatedImageUrl] = await Promise.all([
