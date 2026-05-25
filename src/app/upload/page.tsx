@@ -310,7 +310,7 @@ export default function Upload() {
 
     try {
       const existingGeneration = await checkExistingGeneration(requestId);
-      if (existingGeneration?.status === 'completed' && existingGeneration.generationId) {
+      if (existingGeneration?.generationId && (existingGeneration.status === 'completed' || existingGeneration.status === 'failed')) {
         await finalizeGeneration({ generationId: existingGeneration.generationId });
         return;
       }
@@ -324,9 +324,7 @@ export default function Upload() {
           return;
         }
         if (completedGeneration?.status === 'failed') {
-          await showRetryState(t.upload.generationFailed, 'retry-current', {
-            keepFile: true,
-          });
+          await finalizeGeneration({ generationId: completedGeneration.generationId || requestId });
           return;
         }
         if (completedGeneration?.status === 'expired') {
@@ -371,9 +369,7 @@ export default function Upload() {
         }
 
         if (completedGeneration?.status === 'failed') {
-          await showRetryState(t.upload.generationFailed, 'retry-current', {
-            keepFile: true,
-          });
+          await finalizeGeneration({ generationId: completedGeneration.generationId || requestId });
           return;
         }
 
@@ -392,9 +388,12 @@ export default function Upload() {
           { keepFile: true }
         );
         return;
+      } else if (res.ok && data.success && data.status === 'failed' && data.generationId) {
+        await finalizeGeneration({ generationId: data.generationId });
+        return;
       } else {
         const recoveredGeneration = await checkExistingGeneration(requestId);
-        if (recoveredGeneration?.status === 'completed' && recoveredGeneration.generationId) {
+        if (recoveredGeneration?.generationId && (recoveredGeneration.status === 'completed' || recoveredGeneration.status === 'failed')) {
           await finalizeGeneration({ generationId: recoveredGeneration.generationId });
           return;
         }
@@ -405,7 +404,7 @@ export default function Upload() {
       }
     } catch {
       const recoveredGeneration = await checkExistingGeneration(requestId);
-      if (recoveredGeneration?.status === 'completed' && recoveredGeneration.generationId) {
+      if (recoveredGeneration?.generationId && (recoveredGeneration.status === 'completed' || recoveredGeneration.status === 'failed')) {
         await finalizeGeneration({ generationId: recoveredGeneration.generationId });
         return;
       }
@@ -441,7 +440,7 @@ export default function Upload() {
       setRetryMode('hidden');
 
       const recoveredGeneration = await checkExistingGeneration(pendingGeneration.requestId);
-      if (recoveredGeneration?.status === 'completed' && recoveredGeneration.generationId) {
+      if (recoveredGeneration?.generationId && (recoveredGeneration.status === 'completed' || recoveredGeneration.status === 'failed')) {
         await finalizeGeneration({ generationId: recoveredGeneration.generationId });
         return;
       }
@@ -452,9 +451,7 @@ export default function Upload() {
           return;
         }
         if (completedGeneration?.status === 'failed') {
-          await showRetryState(t.upload.previousFailed, 'retry-current', {
-            keepFile: true,
-          });
+          await finalizeGeneration({ generationId: completedGeneration.generationId || pendingGeneration.requestId });
           return;
         }
         if (completedGeneration?.status === 'expired') {

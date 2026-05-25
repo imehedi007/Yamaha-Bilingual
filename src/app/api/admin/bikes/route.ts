@@ -22,11 +22,18 @@ export async function POST(req: Request) {
   try {
     await checkAdmin();
     const body = await req.json();
-    const { model_name, type, description, image_url, colors } = body;
+    const { model_name, type, description, description_bn, image_url, colors } = body;
     
     await query(
-      'INSERT INTO bikes (model_name, type, description, image_url, colors) VALUES (?, ?, ?, ?, ?)',
-      [model_name, type, description || '', image_url || '', JSON.stringify(colors || [])]
+      'INSERT INTO bikes (model_name, type, description, description_bn, image_url, colors) VALUES (?, ?, ?, ?, ?, ?)',
+      [
+        model_name,
+        type,
+        description || '',
+        description_bn || null,
+        image_url || '',
+        JSON.stringify(colors || [])
+      ]
     );
     return NextResponse.json({ success: true });
   } catch (err: any) {
@@ -53,13 +60,21 @@ export async function PUT(req: Request) {
   try {
     await checkAdmin();
     const body = await req.json();
-    const { id, model_name, type } = body;
+    const { id, model_name, type, description, description_bn, image_url, colors } = body;
     
     if (!id) return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
     
     await query(
-      'UPDATE bikes SET model_name = ?, type = ? WHERE id = ?',
-      [model_name, type, id]
+      'UPDATE bikes SET model_name = ?, type = ?, description = ?, description_bn = ?, image_url = ?, colors = ? WHERE id = ?',
+      [
+        model_name,
+        type,
+        description || '',
+        description_bn || null,
+        image_url || '',
+        JSON.stringify(colors || []),
+        id
+      ]
     );
     return NextResponse.json({ success: true });
   } catch (err: any) {

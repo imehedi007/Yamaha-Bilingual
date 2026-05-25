@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/server/mysql';
-import { generateCinematicImage, generatePersonaCopy } from '@/lib/server/gemini';
+import { generateCinematicImage, generatePersonaCopy, getBikeImageBase64 } from '@/lib/server/gemini';
 import { buildImagePrompt, parsePersonaPayload, selectBikeForPersona } from '@/lib/server/ride-persona';
 import { getApiMessages, getRequestLanguage } from '@/lib/i18n/api';
 import { cookies } from 'next/headers';
@@ -245,56 +245,80 @@ export async function POST(req: Request) {
       throw reservationError;
     }
 
-    console.log('[api/generate] Generating persona copy and image in parallel...');
+    console.log('[api/generate] Generating persona copy and image...');
     const personaSummary = `${destinationMood} with ${aspirationTone.toLowerCase()}`;
 
-    // Run both AI tasks concurrently to reduce response latency
-    const [personaCopy, generatedImageUrl] = await Promise.all([
-      generatePersonaCopy(personaSummary, bikeModel),
-      generateCinematicImage(base64Image, mimeType, finalPrompt).catch((aiError: any) => {
-        console.error('Gemini Image Generation Error:', aiError);
-        throw new Error(`AI Generation failed: ${aiError.message || 'Unknown AI error'}`);
-      })
-    ]);
-    mark('ai-complete');
+    // Fetch the cached bike reference image base64 bytes (takes 0ms on cache hits)
+    const bikeRef = await getBikeImageBase64(selection.bike.image_url);
 
-    // Upload to AWS S3 instead of local public folder
-    console.log('[api/generate] Uploading to S3...');
-    const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
-    
-    // Convert base64 data URI to buffer
-    const base64Data = generatedImageUrl.replace(/^data:image\/\w+;base64,/, "");
-    const imgBuffer = Buffer.from(base64Data, 'base64');
-    
-    const s3Client = new S3Client({ region: process.env.AWS_REGION || 'us-east-1' });
-    const bucketName = process.env.S3_BUCKET_NAME;
-    
-    if (!bucketName) {
-      throw new Error('S3_BUCKET_NAME is not configured in .env.local');
-    }
+    let personaCopy = `Experience the thrill of the ride. You and the ${bikeModel} are a perfect match.`;
+    let generatedImageUrl = null;
+    let generationStatus = 'completed';
 
-    const fileName = `generations/gen_${hashId}.jpg`;
-    
+    // 1. Generate the appreciation text
     try {
-      const s3Command = new PutObjectCommand({
-        Bucket: bucketName,
-        Key: fileName,
-        Body: imgBuffer,
-        ContentType: 'image/jpeg',
-        ACL: 'public-read' // Make it publicly accessible
-      });
-      
-      await s3Client.send(s3Command);
-      mark('s3-uploaded');
-    } catch (s3Error: any) {
-      console.error('S3 Upload Error:', s3Error);
-      throw new Error(`S3 Upload failed: ${s3Error.message || 'Check AWS credentials and Bucket Block Public Access settings'}`);
+      const generatedCopy = await generatePersonaCopy(personaSummary, bikeModel);
+      if (generatedCopy) {
+        personaCopy = generatedCopy;
+      }
+    } catch (textError) {
+      console.error('Persona text generation failed:', textError);
     }
 
-    const publicS3Url = `https://${bucketName}.s3.${process.env.AWS_REGION || 'us-east-1'}.amazonaws.com/${fileName}`;
+    // 2. Generate the cinematic face-matched image
+    try {
+      generatedImageUrl = await generateCinematicImage(
+        base64Image,
+        mimeType,
+        bikeRef?.base64 || null,
+        bikeRef?.mimeType || null,
+        finalPrompt
+      );
+    } catch (aiError: any) {
+      console.error('Gemini Image Generation Failed. Triggering premium fallback card...', aiError);
+      generationStatus = 'failed';
+    }
+
+    let publicS3Url = selection.bike.image_url;
+
+    if (generationStatus === 'completed' && generatedImageUrl) {
+      // Upload to AWS S3 instead of local public folder
+      console.log('[api/generate] Uploading generated image to S3...');
+      const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
+      
+      // Convert base64 data URI to buffer
+      const base64Data = generatedImageUrl.replace(/^data:image\/\w+;base64,/, "");
+      const imgBuffer = Buffer.from(base64Data, 'base64');
+      
+      const s3Client = new S3Client({ region: process.env.AWS_REGION || 'us-east-1' });
+      const bucketName = process.env.S3_BUCKET_NAME;
+      
+      if (!bucketName) {
+        throw new Error('S3_BUCKET_NAME is not configured in .env.local');
+      }
+
+      const fileName = `generations/gen_${hashId}.jpg`;
+      
+      try {
+        const s3Command = new PutObjectCommand({
+          Bucket: bucketName,
+          Key: fileName,
+          Body: imgBuffer,
+          ContentType: 'image/jpeg',
+          ACL: 'public-read' // Make it publicly accessible
+        });
+        
+        await s3Client.send(s3Command);
+        publicS3Url = `https://${bucketName}.s3.${process.env.AWS_REGION || 'us-east-1'}.amazonaws.com/${fileName}`;
+        mark('s3-uploaded');
+      } catch (s3Error: any) {
+        console.error('S3 Upload Error, falling back to static bike card:', s3Error);
+        generationStatus = 'failed';
+      }
+    }
 
     // Save to database
-    console.log('[api/generate] Saving to database...');
+    console.log('[api/generate] Saving generation record to database with status:', generationStatus);
     await query(
       `UPDATE generations
        SET generated_image_url = ?,
@@ -304,7 +328,7 @@ export async function POST(req: Request) {
       [
         publicS3Url,
         personaCopy,
-        'completed',
+        generationStatus,
         hashId,
       ]
     );
@@ -319,9 +343,7 @@ export async function POST(req: Request) {
     console.log('[api/generate] completed', {
       totalMs: Date.now() - startedAt,
       checkpoints,
-      uploadedPhotoBytes: buffer.length,
-      encodedPhotoBase64Chars: base64Image.length,
-      generatedImageBase64Chars: generatedImageUrl.length,
+      status: generationStatus,
     });
 
     return NextResponse.json({
@@ -329,7 +351,7 @@ export async function POST(req: Request) {
       generationId: hashId,
       imageUrl: publicS3Url,
       personaCopy,
-      status: 'completed'
+      status: generationStatus
     });
 
   } catch (error: any) {
