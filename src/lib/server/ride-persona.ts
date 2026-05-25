@@ -177,11 +177,11 @@ function buildWardrobePrompt(gender?: string | null, isEidCampEnabled?: boolean)
   }
 
   if (gender === 'Female') {
-    return 'Wardrobe: elegant premium Eid fashion with a Yamaha-inspired edge, such as a refined Pakistani dress, polished three-piece set, graceful gown, coordinated trousers or payjama, and clean fashionable sandals; modest, well-fitted, polished, and camera-ready.';
+    return 'Premium modern Eid styling: an elegant, tailored designer pakistani salwar kameez in a sophisticated deep shade, paired with posh matching heels. Graceful, modest, perfectly fitted, and camera-ready.';
   }
 
   if (gender === 'Male') {
-    return 'Wardrobe: premium Eid styling with a Yamaha-inspired biker attitude, such as a tailored punjabi, clean payjama or tapered trousers, and polished sandals or sandal shoes; refined, well-fitted, polished, and camera-ready.';
+    return 'Premium modern Eid styling: a tailored designer Punjabi in a deep dark tone, clean payjama trousers, and polished leather loafers. Clean, well-fitted, and camera-ready.';
   }
 
   return 'Wardrobe: premium Yamaha-inspired Eid streetwear, polished, clean, modest, and well-fitted.';
@@ -351,6 +351,11 @@ export function buildImagePrompt(args: {
   const genderGuidance = buildGenderGuidance(args.gender);
   const wardrobePrompt = buildWardrobePrompt(args.gender, args.isEidCampEnabled);
 
+  const isFzsV4 = args.bikeModel.toLowerCase().includes('fzs') && args.bikeModel.toLowerCase().includes('v4');
+  const vehicleDetails = isFzsV4
+    ? 'The motorcycle must feature the authentic FZS V4 front face: a modern shield-shaped headlamp housing with a central LED projector lens and signature bracket-shaped LED Daytime Running Lights (DRLs) on the sides. The tank shrouds are sleek and solid body-colored, with no silver mesh vents. Do not render the older split-triangular headlight or mesh side vents of the FZS V3. Accurate proportions, clean frame geometry, realistic materials, and proper metallic reflections.'
+    : 'with authentic model presence, accurate proportions, clean frame geometry, realistic materials, proper reflections, detailed mechanical parts, and high-quality motorcycle styling.';
+
   return [
     FIXED_IDENTITY_BLOCK,
     FIXED_COMPOSITION_BLOCK,
@@ -359,7 +364,7 @@ export function buildImagePrompt(args: {
     'Maintain realistic anatomy, balanced posture, natural body mechanics, clean hands, and correct limb proportions.',
     genderGuidance,
     `Pose: ${selectedPose}`,
-    `Vehicle: realistic ${args.bikeModel} in ${args.bikeColor}, with authentic model presence, accurate proportions, clean frame geometry, realistic materials, proper reflections, detailed mechanical parts, and high-quality motorcycle styling.`,
+    `Vehicle: realistic ${args.bikeModel} in ${args.bikeColor}, ${vehicleDetails}`,
     `Environment: ${destinationScene}.`,
     `Mood: ${finalMood}.`,
     wardrobePrompt,
