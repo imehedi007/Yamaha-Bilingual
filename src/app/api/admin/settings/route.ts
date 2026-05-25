@@ -55,7 +55,7 @@ export async function PUT(req: Request) {
     if (body.eid_camp_enabled !== undefined) {
       await updateSetting('eid_camp_enabled', body.eid_camp_enabled);
 
-      const isEnabled = body.eid_camp_enabled !== 'false';
+      const isEnabled = body.eid_camp_enabled === true || body.eid_camp_enabled === 'true';
       const enableQuestionId = isEnabled ? 4 : 2;
       const disableQuestionId = isEnabled ? 2 : 4;
 

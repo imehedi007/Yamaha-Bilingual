@@ -67,8 +67,9 @@ export default async function Result({ params }: { params: Promise<{ id: string 
     name: string;
     model_name: string;
     traits_summary: string;
+    status: string;
   }>>(`
-    SELECT g.*, u.name, b.model_name 
+    SELECT g.generated_image_url, g.traits_summary, g.status, u.name, b.model_name 
     FROM generations g
     JOIN users u ON g.user_id = u.id
     JOIN bikes b ON g.bike_id = b.id
@@ -87,6 +88,7 @@ export default async function Result({ params }: { params: Promise<{ id: string 
       name={data.name}
       modelName={data.model_name}
       traitsSummary={data.traits_summary}
+      status={data.status}
     />
   );
 }

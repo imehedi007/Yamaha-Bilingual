@@ -20,12 +20,25 @@ export async function POST(req: Request) {
     const messages = getApiMessages(await getRequestLanguage(req));
     const body = await req.json();
     const result = sendOtpSchema.safeParse(body);
-
     if (!result.success) {
       return NextResponse.json({ error: messages.invalidPhone }, { status: 400 });
     }
 
-    const { name, phone, dob, gender, division } = result.data;
+    const { name, phone: rawPhone, dob, gender, division } = result.data;
+
+    // Strict BD phone validation and normalization
+    const cleaned = rawPhone.replace(/[^\d+]/g, '');
+    let phone = '';
+
+    if (/^01[3-9]\d{8}$/.test(cleaned)) {
+      phone = `+88${cleaned}`;
+    } else if (/^8801[3-9]\d{8}$/.test(cleaned)) {
+      phone = `+${cleaned}`;
+    } else if (/^\+8801[3-9]\d{8}$/.test(cleaned)) {
+      phone = cleaned;
+    } else {
+      return NextResponse.json({ error: messages.invalidPhone }, { status: 400 });
+    }
 
     // Check if OTP is disabled in settings
     const settings = await query<any[]>("SELECT setting_value FROM app_settings WHERE setting_key = 'otp_enabled'");

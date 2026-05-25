@@ -35,11 +35,30 @@ export default function Home() {
     setLoading(true);
     setError('');
 
+    // Strict BD phone validation and normalization
+    const cleaned = phone.replace(/[^\d+]/g, '');
+    let formattedPhone = '';
+
+    if (/^01[3-9]\d{8}$/.test(cleaned)) {
+      formattedPhone = `+88${cleaned}`;
+    } else if (/^8801[3-9]\d{8}$/.test(cleaned)) {
+      formattedPhone = `+${cleaned}`;
+    } else if (/^\+8801[3-9]\d{8}$/.test(cleaned)) {
+      formattedPhone = cleaned;
+    } else {
+      setLoading(false);
+      setError(t.api.invalidPhone);
+      return;
+    }
+
+    // Keep state updated so that OTP and view match
+    setPhone(formattedPhone);
+
     try {
       const res = await fetch('/api/auth/otp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, dob, gender, division, lang: language }),
+        body: JSON.stringify({ name, phone: formattedPhone, dob, gender, division, lang: language }),
       });
       const data = await res.json();
 
@@ -136,8 +155,13 @@ export default function Home() {
                 <label>{t.home.phoneNumber}</label>
                 <input
                   type="tel"
+                  maxLength={14}
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    // Sanitizes input: only digits and a single leading plus are permitted
+                    const val = e.target.value.replace(/(?!^\+)[^\d]/g, '');
+                    setPhone(val);
+                  }}
                   placeholder={t.home.placeholderPhone}
                   required
                 />
