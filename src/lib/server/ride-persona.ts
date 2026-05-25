@@ -359,10 +359,7 @@ export function buildImagePrompt(args: {
   return [
     FIXED_IDENTITY_BLOCK,
     FIXED_COMPOSITION_BLOCK,
-    'Randomly select exactly one approved pose and use only that pose.',
-    'Do not mix poses or body positions.',
-    'Maintain realistic anatomy, balanced posture, natural body mechanics, clean hands, and correct limb proportions.',
-    genderGuidance,
+    `Gender guidance: ${genderGuidance}`,
     `Pose: ${selectedPose}`,
     `Vehicle: realistic ${args.bikeModel} in ${args.bikeColor}, ${vehicleDetails}`,
     `Environment: ${destinationScene}.`,

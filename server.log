@@ -2,24 +2,255 @@
 > yamaha-test@0.1.0 dev
 > next dev
 
-[1G[0K[1m[38;2;173;127;168m▲ Next.js 16.2.6[39m[22m (Turbopack)
+▲ Next.js 16.2.6 (Turbopack)
 - Local:         http://localhost:3000
-- Network:       http://192.168.0.184:3000
+- Network:       http://172.20.10.2:3000
 - Environments: .env.local
-[32m[1m✓[22m[39m Ready in 309ms
+✓ Ready in 385ms
 
- GET /admin/login [32m200[39m in 319ms[2m (next.js: 174ms, application-code: 146ms)[22m
- GET /result/cd851b30a36e4ae583430e58cb3f563e [32m200[39m in 1468ms[2m (next.js: 515ms, application-code: 954ms)[22m
- POST /api/admin/auth/login [32m200[39m in 198ms[2m (next.js: 170ms, application-code: 27ms)[22m
- GET /admin [32m200[39m in 43ms[2m (next.js: 24ms, application-code: 19ms)[22m
- GET /api/admin/auth/me [32m200[39m in 177ms[2m (next.js: 165ms, application-code: 13ms)[22m
- GET /api/admin/generations?limit=1 [32m200[39m in 1192ms[2m (next.js: 134ms, application-code: 1057ms)[22m
- GET /api/admin/users?limit=1 [32m200[39m in 1218ms[2m (next.js: 212ms, application-code: 1005ms)[22m
- GET /api/admin/quiz/questions [32m200[39m in 1194ms[2m (next.js: 232ms, application-code: 962ms)[22m
- GET /api/admin/bikes [32m200[39m in 1260ms[2m (next.js: 278ms, application-code: 982ms)[22m
- GET /api/admin/quiz/questions [32m200[39m in 399ms[2m (next.js: 25ms, application-code: 375ms)[22m
- GET /api/admin/users?limit=1 [32m200[39m in 404ms[2m (next.js: 23ms, application-code: 381ms)[22m
- GET /api/admin/generations?limit=1 [32m200[39m in 414ms[2m (next.js: 17ms, application-code: 396ms)[22m
- GET /api/admin/bikes [32m200[39m in 346ms[2m (next.js: 4ms, application-code: 342ms)[22m
-tail -f server.log^C[?25h
-[1G[0K⠙[1G[0K
+⨯ ReferenceError: window is not defined
+    at ResultActions (src/app/result/[id]/ResultActions.tsx:38:20)
+  36 |   const shareText = t.result.shareText;
+  37 |   const shareTitle = `Yamaha Persona - ${userName}`;
+> 38 |   const shareUrl = window.location.href;
+     |                    ^
+  39 |
+  40 |   const openShareWindow = (url: string) => {
+  41 |     window.open(url, '_blank', 'noopener,noreferrer,width=720,height=640'); {
+  digest: '2173332360'
+}
+ GET /result/c49affed03db47b0b54e31fc28e84f65 500 in 909ms (next.js: 688ms, application-code: 221ms)
+ GET /api/download?url=https%3A%2F%2Fyamaha-ai-generations-2026.s3.ap-south-1.amazonaws.com%2Fgenerations%2Fgen_c49affed03db47b0b54e31fc28e84f65.jpg 200 in 1415ms (next.js: 168ms, application-code: 1247ms)
+⨯ ReferenceError: window is not defined
+    at ResultActions (src/app/result/[id]/ResultActions.tsx:38:20)
+  36 |   const shareText = t.result.shareText;
+  37 |   const shareTitle = `Yamaha Persona - ${userName}`;
+> 38 |   const shareUrl = window.location.href;
+     |                    ^
+  39 |
+  40 |   const openShareWindow = (url: string) => {
+  41 |     window.open(url, '_blank', 'noopener,noreferrer,width=720,height=640'); {
+  digest: '2173332360'
+}
+ GET /result/c49affed03db47b0b54e31fc28e84f65 500 in 140ms (next.js: 14ms, application-code: 126ms)
+ GET / 200 in 78ms (next.js: 40ms, application-code: 37ms)
+ GET /api/download?url=https%3A%2F%2Fyamaha-ai-generations-2026.s3.ap-south-1.amazonaws.com%2Fgenerations%2Fgen_c49affed03db47b0b54e31fc28e84f65.jpg 200 in 24.2s (next.js: 15ms, application-code: 24.1s)
+ GET /admin 200 in 104ms (next.js: 41ms, application-code: 63ms)
+ GET /api/admin/auth/me 401 in 50ms (next.js: 43ms, application-code: 7ms)
+ GET /admin/login 200 in 47ms (next.js: 33ms, application-code: 14ms)
+ POST /api/admin/auth/login 200 in 86ms (next.js: 77ms, application-code: 9ms)
+ GET /admin 200 in 17ms (next.js: 2ms, application-code: 15ms)
+ GET /api/admin/auth/me 200 in 122ms (next.js: 95ms, application-code: 27ms)
+ GET /api/admin/bikes 200 in 149ms (next.js: 120ms, application-code: 28ms)
+ GET /api/admin/quiz/questions 200 in 144ms (next.js: 92ms, application-code: 52ms)
+ GET /api/admin/users?limit=1 200 in 155ms (next.js: 60ms, application-code: 95ms)
+ GET /api/admin/generations?limit=1 200 in 163ms (next.js: 80ms, application-code: 82ms)
+ GET /api/admin/bikes 200 in 11ms (next.js: 1499µs, application-code: 9ms)
+ GET /api/admin/users?limit=1 200 in 12ms (next.js: 5ms, application-code: 7ms)
+ GET /api/admin/quiz/questions 200 in 13ms (next.js: 3ms, application-code: 10ms)
+ GET /api/admin/generations?limit=1 200 in 10ms (next.js: 1870µs, application-code: 8ms)
+ GET /admin/generations 200 in 55ms (next.js: 38ms, application-code: 17ms)
+ GET /api/admin/auth/me 200 in 12ms (next.js: 9ms, application-code: 3ms)
+ GET /api/admin/generations?page=1&limit=20 200 in 20ms (next.js: 5ms, application-code: 15ms)
+ GET /api/admin/generations?page=1&limit=20 200 in 10ms (next.js: 1501µs, application-code: 9ms)
+⨯ ReferenceError: window is not defined
+    at ResultActions (src/app/result/[id]/ResultActions.tsx:38:20)
+  36 |   const shareText = t.result.shareText;
+  37 |   const shareTitle = `Yamaha Persona - ${userName}`;
+> 38 |   const shareUrl = window.location.href;
+     |                    ^
+  39 |
+  40 |   const openShareWindow = (url: string) => {
+  41 |     window.open(url, '_blank', 'noopener,noreferrer,width=720,height=640'); {
+  digest: '2173332360'
+}
+ GET /result/c49affed03db47b0b54e31fc28e84f65 500 in 135ms (next.js: 12ms, application-code: 123ms)
+[Server HMR] Update failed, full reload needed: SyntaxError: Identifier 'shareOnInstagram' has already been declared
+    at eval (<anonymous>)
+[Server HMR] Listener error: SyntaxError: Identifier 'shareOnInstagram' has already been declared
+    at eval (<anonymous>)
+⨯ ./src/app/result/[id]/ResultActions.tsx:108:9
+the name `shareOnInstagram` is defined multiple times
+  [90m106 |[0m   };
+  [90m107 |[0m
+[31m[1m>[0m [90m108 |[0m   [36mconst[0m shareOnInstagram = [36masync[0m () => {
+  [90m    |[0m         [31m[1m^^^^^^^^^^^^^^^^[0m
+  [90m109 |[0m     [36mtry[0m {
+  [90m110 |[0m       [36mif[0m (navigator.share) {
+  [90m111 |[0m         [36mconst[0m shareFile = [36mawait[0m fetchShareFile();
+
+Ecmascript file had an error
+
+Import traces:
+  Client Component Browser:
+    ./src/app/result/[id]/ResultActions.tsx [Client Component Browser]
+    ./src/app/result/[id]/ResultView.tsx [Client Component Browser]
+    ./src/app/result/[id]/ResultView.tsx [Server Component]
+    ./src/app/result/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/result/[id]/ResultActions.tsx [Client Component SSR]
+    ./src/app/result/[id]/ResultView.tsx [Client Component SSR]
+    ./src/app/result/[id]/ResultView.tsx [Server Component]
+    ./src/app/result/[id]/page.tsx [Server Component]
+
+
+✓ Compiled in 527ms
+ GET /result/c49affed03db47b0b54e31fc28e84f65 500 in 799ms (next.js: 713ms, application-code: 87ms)
+ GET /admin/generations 500 in 807ms (next.js: 797ms, application-code: 10ms)
+⨯ ./src/app/result/[id]/ResultActions.tsx:108:9
+the name `shareOnInstagram` is defined multiple times
+  [90m106 |[0m   };
+  [90m107 |[0m
+[31m[1m>[0m [90m108 |[0m   [36mconst[0m shareOnInstagram = [36masync[0m () => {
+  [90m    |[0m         [31m[1m^^^^^^^^^^^^^^^^[0m
+  [90m109 |[0m     [36mtry[0m {
+  [90m110 |[0m       [36mif[0m (navigator.share) {
+  [90m111 |[0m         [36mconst[0m shareFile = [36mawait[0m fetchShareFile();
+
+Ecmascript file had an error
+
+Import traces:
+  Client Component Browser:
+    ./src/app/result/[id]/ResultActions.tsx [Client Component Browser]
+    ./src/app/result/[id]/ResultView.tsx [Client Component Browser]
+    ./src/app/result/[id]/ResultView.tsx [Server Component]
+    ./src/app/result/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/result/[id]/ResultActions.tsx [Client Component SSR]
+    ./src/app/result/[id]/ResultView.tsx [Client Component SSR]
+    ./src/app/result/[id]/ResultView.tsx [Server Component]
+    ./src/app/result/[id]/page.tsx [Server Component]
+
+
+ GET /admin/generations 500 in 17ms (next.js: 7ms, application-code: 9ms)
+ GET /result/c49affed03db47b0b54e31fc28e84f65 500 in 28ms (next.js: 17ms, application-code: 11ms)
+[browser] Uncaught Error: ./src/app/result/[id]/ResultActions.tsx:108:9
+the name `shareOnInstagram` is defined multiple times
+  106 |   };
+  107 |
+> 108 |   const shareOnInstagram = async () => {
+      |         ^^^^^^^^^^^^^^^^
+  109 |     try {
+  110 |       if (navigator.share) {
+  111 |         const shareFile = await fetchShareFile();
+
+Ecmascript file had an error
+
+Import traces:
+  Client Component Browser:
+    ./src/app/result/[id]/ResultActions.tsx [Client Component Browser]
+    ./src/app/result/[id]/ResultView.tsx [Client Component Browser]
+    ./src/app/result/[id]/ResultView.tsx [Server Component]
+    ./src/app/result/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/result/[id]/ResultActions.tsx [Client Component SSR]
+    ./src/app/result/[id]/ResultView.tsx [Client Component SSR]
+    ./src/app/result/[id]/ResultView.tsx [Server Component]
+    ./src/app/result/[id]/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/app/result/[id]/ResultActions.tsx:108:9)
+    at <unknown> (Error: (./src/app/result/[id]/ResultActions.tsx:108:9)
+[browser] Uncaught Error: ./src/app/result/[id]/ResultActions.tsx:108:9
+the name `shareOnInstagram` is defined multiple times
+  106 |   };
+  107 |
+> 108 |   const shareOnInstagram = async () => {
+      |         ^^^^^^^^^^^^^^^^
+  109 |     try {
+  110 |       if (navigator.share) {
+  111 |         const shareFile = await fetchShareFile();
+
+Ecmascript file had an error
+
+Import traces:
+  Client Component Browser:
+    ./src/app/result/[id]/ResultActions.tsx [Client Component Browser]
+    ./src/app/result/[id]/ResultView.tsx [Client Component Browser]
+    ./src/app/result/[id]/ResultView.tsx [Server Component]
+    ./src/app/result/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/result/[id]/ResultActions.tsx [Client Component SSR]
+    ./src/app/result/[id]/ResultView.tsx [Client Component SSR]
+    ./src/app/result/[id]/ResultView.tsx [Server Component]
+    ./src/app/result/[id]/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/app/result/[id]/ResultActions.tsx:108:9)
+    at <unknown> (Error: (./src/app/result/[id]/ResultActions.tsx:108:9)
+✓ Compiled in 21ms
+ GET /admin/generations 200 in 318ms (next.js: 92ms, application-code: 227ms)
+ GET /api/admin/auth/me 200 in 135ms (next.js: 112ms, application-code: 23ms)
+ GET /result/c49affed03db47b0b54e31fc28e84f65 200 in 423ms (next.js: 66ms, application-code: 357ms)
+ GET /api/admin/generations?page=1&limit=20 200 in 109ms (next.js: 57ms, application-code: 53ms)
+ GET /api/admin/generations?page=1&limit=20 200 in 34ms (next.js: 1961µs, application-code: 32ms)
+ GET /result/c49affed03db47b0b54e31fc28e84f65 200 in 193ms (next.js: 47ms, application-code: 146ms)
+ GET / 200 in 85ms (next.js: 33ms, application-code: 52ms)
+ POST /api/auth/otp/send 200 in 226ms (next.js: 129ms, application-code: 97ms)
+ GET /quiz 200 in 37ms (next.js: 24ms, application-code: 13ms)
+ GET /api/quiz/questions?lang=en 200 in 60ms (next.js: 36ms, application-code: 24ms)
+ GET /api/quiz/questions?lang=en 200 in 9ms (next.js: 1365µs, application-code: 8ms)
+ POST /api/quiz/submit 200 in 53ms (next.js: 42ms, application-code: 10ms)
+ GET /upload 200 in 38ms (next.js: 22ms, application-code: 16ms)
+ GET /api/generate?requestId=c6641affbd3d40a594a0d958177e3521 200 in 113ms (next.js: 101ms, application-code: 12ms)
+[api/generate] form-data-parsed at 3ms
+[api/generate] auth-verified at 6ms
+[api/generate] rate-limit-checked at 23ms
+[api/generate] photo-encoded at 24ms
+[api/generate] persona-parsed at 24ms
+[api/generate] bike-selected at 31ms
+[api/generate] user-profile-loaded at 42ms
+[api/generate] generation-reserved at 55ms
+[api/generate] Generating persona copy and image...
+[generateCinematicImage] starting request {
+  model: 'gemini-3.1-flash-image-preview',
+  userMimeType: 'image/jpeg',
+  hasBikeImage: false,
+  bikeMimeType: 'image/jpeg',
+  promptLength: 2171,
+  referenceImageCopies: 3,
+  referenceImageReason: 'intentional face-match boost',
+  userBase64Chars: 45108
+}
+[generateCinematicImage] Gemini transient error detected, retrying... {
+  attempt: 1,
+  retryInMs: 2000,
+  elapsedMs: 90019,
+  error: 'The operation was aborted due to timeout',
+  status: undefined
+}
+[generateCinematicImage] completed {
+  attempt: 2,
+  attemptMs: 13324,
+  totalMs: 105348,
+  outputMimeType: 'image/jpeg',
+  outputBase64Chars: 1044424
+}
+[api/generate] Uploading generated image to S3...
+[api/generate] s3-uploaded at 115357ms
+[api/generate] Saving generation record to database with status: completed
+[api/generate] db-saved at 115374ms
+[api/generate] cookie-cleared at 115375ms
+[api/generate] completed {
+  totalMs: 115376,
+  checkpoints: {
+    'form-data-parsed': 3,
+    'auth-verified': 6,
+    'rate-limit-checked': 23,
+    'photo-encoded': 24,
+    'persona-parsed': 24,
+    'bike-selected': 31,
+    'user-profile-loaded': 42,
+    'generation-reserved': 55,
+    's3-uploaded': 115357,
+    'db-saved': 115374,
+    'cookie-cleared': 115375
+  },
+  status: 'completed'
+}
+ POST /api/generate 200 in 115s (next.js: 1429µs, application-code: 115s)
+ GET /result/c6641affbd3d40a594a0d958177e3521 200 in 52ms (next.js: 17ms, application-code: 35ms)
