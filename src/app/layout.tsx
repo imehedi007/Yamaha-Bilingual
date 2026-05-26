@@ -24,6 +24,11 @@ export const metadata: Metadata = {
   },
   description:
     "Join Yamaha Bangladesh's AI Ride Personality Campaign to discover your rider persona, get matched with a Yamaha bike, and create a shareable cinematic portrait built for riders across Bangladesh.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
   alternates: {
     canonical: "/",
   },
