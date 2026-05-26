@@ -11,9 +11,9 @@ async function checkAdmin() {
 export async function GET(req: Request) {
   try {
     await checkAdmin();
-    
+
     const { searchParams } = new URL(req.url);
-const page = parseInt(searchParams.get('page') || '1', 10);
+    const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '20', 10);
     const offset = (page - 1) * limit;
 
@@ -47,8 +47,8 @@ const page = parseInt(searchParams.get('page') || '1', 10);
       user_id: Number(generation.user_id),
     }));
 
-    return NextResponse.json({ 
-      generations: normalizedGenerations, 
+    return NextResponse.json({
+      generations: normalizedGenerations,
       total: Number(countResult[0].total),
       page,
       limit
