@@ -13,8 +13,10 @@ export async function GET(req: Request) {
     await checkAdmin();
     
     const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    // const page = parseInt(searchParams.get('page') || '1');
+    // const limit = parseInt(searchParams.get('limit') || '20');
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '20', 10);
     const offset = (page - 1) * limit;
 
     const [users, countResult] = await Promise.all([
@@ -27,19 +29,28 @@ export async function GET(req: Request) {
           u.gender,
           u.division,
           u.created_at,
-          COUNT(g.id) as total_generations
+          COALESCE(g.total_generations, 0) as total_generations
         FROM users u
-        LEFT JOIN generations g ON u.id = g.user_id
-        GROUP BY u.id
+        LEFT JOIN (
+          SELECT user_id, COUNT(*) as total_generations
+          FROM generations
+          GROUP BY user_id
+        ) g ON u.id = g.user_id
         ORDER BY u.created_at DESC
-        LIMIT ? OFFSET ?
-      `, [limit, offset]),
+        LIMIT ${limit} OFFSET ${offset}
+      `),
       query<any[]>('SELECT COUNT(*) as total FROM users')
     ]);
 
+    const normalizedUsers = users.map((user) => ({
+      ...user,
+      id: Number(user.id),
+      total_generations: Number(user.total_generations),
+    }));
+
     return NextResponse.json({ 
-      users, 
-      total: countResult[0].total,
+      users: normalizedUsers, 
+      total: Number(countResult[0].total),
       page,
       limit
     });
@@ -48,6 +59,6 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     console.error('Admin users error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }

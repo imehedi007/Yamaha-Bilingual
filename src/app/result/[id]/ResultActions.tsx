@@ -14,15 +14,15 @@ export default function ResultActions({ imageUrl, userName, status }: ResultActi
   const { t } = useLanguage();
   const [downloadState, setDownloadState] = useState<'idle' | 'downloading' | 'done'>('idle');
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const proxyImageUrl = `/api/download?url=${encodeURIComponent(imageUrl)}`;
 
   const handleDownload = () => {
     if (downloadState !== 'idle') return;
     setDownloadState('downloading');
     
     setTimeout(() => {
-      const proxyUrl = `/api/download?url=${encodeURIComponent(imageUrl)}`;
       const link = document.createElement('a');
-      link.href = proxyUrl;
+      link.href = proxyImageUrl;
       link.download = `Yamaha_Persona_${userName.replace(/\s+/g, '_')}.jpg`;
       document.body.appendChild(link);
       link.click();
@@ -34,52 +34,75 @@ export default function ResultActions({ imageUrl, userName, status }: ResultActi
   };
 
   const shareText = t.result.shareText;
+  const shareTitle = `Yamaha Persona - ${userName}`;
+
+  const getShareUrl = () => window.location.href;
+
+  const openShareWindow = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer,width=720,height=640');
+    setShowShareMenu(false);
+  };
+
+  const fetchShareFile = async () => {
+    const response = await fetch(proxyImageUrl);
+    const blob = await response.blob();
+    return new File([blob], `Yamaha_Persona_${userName.replace(/\s+/g, '_')}.jpg`, {
+      type: blob.type || 'image/jpeg',
+    });
+  };
 
   const shareOnX = () => {
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(window.location.href)}`;
-    window.open(url, '_blank', 'width=600,height=400');
-    setShowShareMenu(false);
+    const shareUrl = getShareUrl();
+    const url = `https://x.com/intent/post?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+    openShareWindow(url);
   };
 
   const shareOnFacebook = () => {
-    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
-    window.open(url, '_blank', 'width=600,height=400');
-    setShowShareMenu(false);
+    const shareUrl = getShareUrl();
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+    openShareWindow(url);
+  };
+
+  const fallbackInstagramShare = () => {
+    const link = document.createElement('a');
+    link.href = proxyImageUrl;
+    link.download = `Yamaha_Persona_${userName.replace(/\s+/g, '_')}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
+    alert(t.result.instagramFallback);
   };
 
   const shareOnInstagram = async () => {
-    // Instagram doesn't have a web intent. Try native share if available, else copy link.
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'My Yamaha Ride Persona',
-          text: shareText,
-          url: window.location.href,
-        });
-      } catch (err) {
-        console.log('Native share failed:', err);
-      }
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert(t.result.copyLinkFallback);
-    }
-    setShowShareMenu(false);
-  };
-
-  const copyImage = async () => {
     try {
-      const response = await fetch(`/api/download?url=${encodeURIComponent(imageUrl)}`);
-      const blob = await response.blob();
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          [blob.type]: blob
-        })
-      ]);
-      alert(t.result.copyImageSuccess);
+      if (navigator.share) {
+        const shareFile = await fetchShareFile();
+        if (navigator.canShare?.({ files: [shareFile] })) {
+          await navigator.share({
+            title: shareTitle,
+            text: shareText,
+            files: [shareFile],
+          });
+          return;
+        }
+
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: getShareUrl(),
+        });
+        return;
+      }
+
+      fallbackInstagramShare();
     } catch (err) {
-      alert(t.result.copyImageFailure);
+      console.log('Instagram share failed:', err);
+      fallbackInstagramShare();
+    } finally {
+      setShowShareMenu(false);
     }
-    setShowShareMenu(false);
   };
 
   return (
@@ -108,10 +131,6 @@ export default function ResultActions({ imageUrl, userName, status }: ResultActi
               <button className={styles.shareDropdownBtn} onClick={shareOnInstagram}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                 {t.result.shareOnInstagram}
-              </button>
-              <button className={styles.shareDropdownBtn} onClick={copyImage}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                {t.result.copyImage}
               </button>
             </div>
           )}

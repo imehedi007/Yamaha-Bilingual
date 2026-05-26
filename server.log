@@ -2,24 +2,49 @@
 > yamaha-test@0.1.0 dev
 > next dev
 
-[1G[0K[1m[38;2;173;127;168m▲ Next.js 16.2.6[39m[22m (Turbopack)
+▲ Next.js 16.2.6 (Turbopack)
 - Local:         http://localhost:3000
-- Network:       http://192.168.0.184:3000
+- Network:       http://192.168.0.105:3000
 - Environments: .env.local
-[32m[1m✓[22m[39m Ready in 309ms
+✓ Ready in 196ms
 
- GET /admin/login [32m200[39m in 319ms[2m (next.js: 174ms, application-code: 146ms)[22m
- GET /result/cd851b30a36e4ae583430e58cb3f563e [32m200[39m in 1468ms[2m (next.js: 515ms, application-code: 954ms)[22m
- POST /api/admin/auth/login [32m200[39m in 198ms[2m (next.js: 170ms, application-code: 27ms)[22m
- GET /admin [32m200[39m in 43ms[2m (next.js: 24ms, application-code: 19ms)[22m
- GET /api/admin/auth/me [32m200[39m in 177ms[2m (next.js: 165ms, application-code: 13ms)[22m
- GET /api/admin/generations?limit=1 [32m200[39m in 1192ms[2m (next.js: 134ms, application-code: 1057ms)[22m
- GET /api/admin/users?limit=1 [32m200[39m in 1218ms[2m (next.js: 212ms, application-code: 1005ms)[22m
- GET /api/admin/quiz/questions [32m200[39m in 1194ms[2m (next.js: 232ms, application-code: 962ms)[22m
- GET /api/admin/bikes [32m200[39m in 1260ms[2m (next.js: 278ms, application-code: 982ms)[22m
- GET /api/admin/quiz/questions [32m200[39m in 399ms[2m (next.js: 25ms, application-code: 375ms)[22m
- GET /api/admin/users?limit=1 [32m200[39m in 404ms[2m (next.js: 23ms, application-code: 381ms)[22m
- GET /api/admin/generations?limit=1 [32m200[39m in 414ms[2m (next.js: 17ms, application-code: 396ms)[22m
- GET /api/admin/bikes [32m200[39m in 346ms[2m (next.js: 4ms, application-code: 342ms)[22m
-tail -f server.log^C[?25h
-[1G[0K⠙[1G[0K
+ GET / 200 in 242ms (next.js: 118ms, application-code: 124ms)
+ GET / 200 in 80ms (next.js: 56ms, application-code: 24ms)
+ GET / 200 in 59ms (next.js: 11ms, application-code: 48ms)
+ GET / 200 in 130ms (next.js: 74ms, application-code: 56ms)
+ GET / 200 in 16ms (next.js: 1313µs, application-code: 15ms)
+ GET / 200 in 155ms (next.js: 43ms, application-code: 112ms)
+ GET /admin 200 in 177ms (next.js: 120ms, application-code: 57ms)
+ GET /api/admin/auth/me 401 in 122ms (next.js: 96ms, application-code: 26ms)
+ GET /admin/login 200 in 81ms (next.js: 59ms, application-code: 22ms)
+ POST /api/admin/auth/login 200 in 102ms (next.js: 80ms, application-code: 23ms)
+ GET /admin 200 in 14ms (next.js: 2ms, application-code: 12ms)
+ GET /api/admin/auth/me 200 in 119ms (next.js: 1840µs, application-code: 117ms)
+ GET /api/admin/quiz/questions 200 in 256ms (next.js: 146ms, application-code: 111ms)
+ GET /api/admin/bikes 200 in 260ms (next.js: 173ms, application-code: 87ms)
+ GET /api/admin/users?limit=1 200 in 276ms (next.js: 120ms, application-code: 156ms)
+ GET /api/admin/generations?limit=1 200 in 267ms (next.js: 84ms, application-code: 183ms)
+ GET /api/admin/users?limit=1 200 in 10ms (next.js: 5ms, application-code: 5ms)
+ GET /api/admin/bikes 200 in 12ms (next.js: 3ms, application-code: 9ms)
+ GET /api/admin/quiz/questions 200 in 15ms (next.js: 1501µs, application-code: 13ms)
+ GET /api/admin/generations?limit=1 200 in 15ms (next.js: 3ms, application-code: 12ms)
+ GET /admin/users 200 in 57ms (next.js: 38ms, application-code: 18ms)
+ GET /api/admin/auth/me 200 in 16ms (next.js: 13ms, application-code: 3ms)
+ GET /api/admin/users?page=1&limit=20 200 in 20ms (next.js: 4ms, application-code: 16ms)
+ GET /api/admin/users?page=1&limit=20 200 in 6ms (next.js: 687µs, application-code: 6ms)
+ GET /api/admin/generations/user?userId=41 200 in 1872ms (next.js: 1841ms, application-code: 31ms)
+ GET /api/admin/generations/user?userId=32 200 in 71ms (next.js: 13ms, application-code: 58ms)
+ GET /admin/generations 200 in 61ms (next.js: 36ms, application-code: 24ms)
+ GET /api/admin/auth/me 200 in 8ms (next.js: 2ms, application-code: 5ms)
+ GET /api/admin/generations?page=1&limit=20 200 in 26ms (next.js: 5ms, application-code: 21ms)
+ GET /api/admin/generations?page=1&limit=20 200 in 19ms (next.js: 3ms, application-code: 16ms)
+ GET /admin 200 in 86ms (next.js: 44ms, application-code: 43ms)
+ GET /api/admin/auth/me 200 in 15ms (next.js: 4ms, application-code: 10ms)
+ GET /api/admin/quiz/questions 200 in 40ms (next.js: 8ms, application-code: 32ms)
+ GET /api/admin/bikes 200 in 52ms (next.js: 11ms, application-code: 41ms)
+ GET /api/admin/users?limit=1 200 in 55ms (next.js: 3ms, application-code: 52ms)
+ GET /api/admin/generations?limit=1 200 in 57ms (next.js: 6ms, application-code: 51ms)
+ GET /api/admin/bikes 200 in 10ms (next.js: 3ms, application-code: 7ms)
+ GET /api/admin/users?limit=1 200 in 11ms (next.js: 4ms, application-code: 7ms)
+ GET /api/admin/quiz/questions 200 in 13ms (next.js: 1428µs, application-code: 11ms)
+ GET /api/admin/generations?limit=1 200 in 16ms (next.js: 883µs, application-code: 15ms)

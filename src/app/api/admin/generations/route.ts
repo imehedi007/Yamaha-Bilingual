@@ -13,8 +13,8 @@ export async function GET(req: Request) {
     await checkAdmin();
     
     const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '20', 10);
     const offset = (page - 1) * limit;
 
     const [generations, countResult] = await Promise.all([
@@ -36,14 +36,20 @@ export async function GET(req: Request) {
         JOIN users u ON g.user_id = u.id
         JOIN bikes b ON g.bike_id = b.id
         ORDER BY g.created_at DESC
-        LIMIT ? OFFSET ?
-      `, [limit, offset]),
+        LIMIT ${limit} OFFSET ${offset}
+      `),
       query<any[]>('SELECT COUNT(*) as total FROM generations')
     ]);
 
+    const normalizedGenerations = generations.map((generation) => ({
+      ...generation,
+      id: Number(generation.id),
+      user_id: Number(generation.user_id),
+    }));
+
     return NextResponse.json({ 
-      generations, 
-      total: countResult[0].total,
+      generations: normalizedGenerations, 
+      total: Number(countResult[0].total),
       page,
       limit
     });
@@ -52,7 +58,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     console.error('Admin generations error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -73,6 +79,6 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     console.error('Admin generations delete error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
