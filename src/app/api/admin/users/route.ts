@@ -13,8 +13,10 @@ export async function GET(req: Request) {
     await checkAdmin();
     
     const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    // const page = parseInt(searchParams.get('page') || '1');
+    // const limit = parseInt(searchParams.get('limit') || '20');
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '20', 10);
     const offset = (page - 1) * limit;
 
     const [users, countResult] = await Promise.all([
@@ -35,8 +37,8 @@ export async function GET(req: Request) {
           GROUP BY user_id
         ) g ON u.id = g.user_id
         ORDER BY u.created_at DESC
-        LIMIT ? OFFSET ?
-      `, [limit, offset]),
+        LIMIT ${limit} OFFSET ${offset}
+      `),
       query<any[]>('SELECT COUNT(*) as total FROM users')
     ]);
 

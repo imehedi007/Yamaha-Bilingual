@@ -13,8 +13,8 @@ export async function GET(req: Request) {
     await checkAdmin();
     
     const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '20', 10);
     const offset = (page - 1) * limit;
 
     const [generations, countResult] = await Promise.all([
@@ -36,8 +36,8 @@ export async function GET(req: Request) {
         JOIN users u ON g.user_id = u.id
         JOIN bikes b ON g.bike_id = b.id
         ORDER BY g.created_at DESC
-        LIMIT ? OFFSET ?
-      `, [limit, offset]),
+        LIMIT ${limit} OFFSET ${offset}
+      `),
       query<any[]>('SELECT COUNT(*) as total FROM generations')
     ]);
 
