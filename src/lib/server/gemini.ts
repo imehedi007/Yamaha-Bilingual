@@ -1,23 +1,35 @@
 import { GoogleGenAI } from '@google/genai';
 
-const getClient = () => {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+const getApiKeys = (): string[] => {
+  const rawKeys = process.env.GEMINI_API_KEY;
+  if (!rawKeys) {
     throw new Error('GEMINI_API_KEY is not set');
   }
+  return rawKeys.split(',').map(key => key.trim()).filter(Boolean);
+};
+
+const getRandomApiKey = (): string => {
+  const keys = getApiKeys();
+  const randomIndex = Math.floor(Math.random() * keys.length);
+  return keys[randomIndex];
+};
+
+const getClient = (apiKey: string) => {
   return new GoogleGenAI({ apiKey });
 };
 
 export async function generatePersonaCopy(personaTitle: string, bikeModel: string) {
-  const client = getClient();
   const model = process.env.AI_TEXT_MODEL || 'gemini-2.5-flash';
-
   const prompt = `Write a short, engaging, premium 2-sentence appreciation statement for a user whose riding personality is "${personaTitle}" and matched with the "${bikeModel}". Make it sound like a luxury automotive campaign.`;
 
+  const keysPool = [...getApiKeys()];
   let retries = 3;
   let delay = 1000;
   
   while (retries > 0) {
+    const keyIndex = Math.floor(Math.random() * keysPool.length);
+    const apiKey = keysPool[keyIndex] || getApiKeys()[0];
+    const client = getClient(apiKey);
     try {
       const response = await client.models.generateContent({
         model,
@@ -27,6 +39,10 @@ export async function generatePersonaCopy(personaTitle: string, bikeModel: strin
     } catch (error: any) {
       if (error.status === 503 && retries > 1) {
         console.warn(`Gemini 503 error. Retrying in ${delay}ms...`);
+        // Remove the failed key from the active pool for this request
+        if (keysPool.length > 1) {
+          keysPool.splice(keyIndex, 1);
+        }
         await new Promise(res => setTimeout(res, delay));
         retries--;
         delay *= 2;
@@ -82,9 +98,9 @@ export async function generateCinematicImage(
   bikeMimeType: string | null,
   prompt: string
 ) {
-  getClient();
   const model = process.env.AI_IMAGE_MODEL || 'gemini-3.1-flash-image-preview';
 
+  const keysPool = [...getApiKeys()];
   let retries = 3;
   let delay = 2000;
   const startedAt = Date.now();
@@ -102,10 +118,11 @@ export async function generateCinematicImage(
   });
 
   while (retries > 0) {
+    const keyIndex = Math.floor(Math.random() * keysPool.length);
+    const apiKey = keysPool[keyIndex] || getApiKeys()[0];
     try {
       const attempt = 4 - retries;
       const attemptStartedAt = Date.now();
-      const apiKey = process.env.GEMINI_API_KEY;
       
       // Expand the prompt to instruct Gemini to align the vehicle design with the visual reference
       let enhancedPrompt = prompt;
@@ -210,6 +227,12 @@ export async function generateCinematicImage(
           error: err.message || err,
           status: err.status
         });
+        
+        // Remove the failed key from the pool for subsequent attempts of this request
+        if (keysPool.length > 1) {
+          keysPool.splice(keyIndex, 1);
+        }
+        
         await new Promise(res => setTimeout(res, delay));
         retries--;
         delay *= 2;
