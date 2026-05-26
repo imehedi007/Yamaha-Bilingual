@@ -58,7 +58,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     console.error('Admin generations error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -79,6 +79,6 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     console.error('Admin generations delete error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }

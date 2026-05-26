@@ -27,10 +27,13 @@ export async function GET(req: Request) {
           u.gender,
           u.division,
           u.created_at,
-          COUNT(g.id) as total_generations
+          COALESCE(g.total_generations, 0) as total_generations
         FROM users u
-        LEFT JOIN generations g ON u.id = g.user_id
-        GROUP BY u.id
+        LEFT JOIN (
+          SELECT user_id, COUNT(*) as total_generations
+          FROM generations
+          GROUP BY user_id
+        ) g ON u.id = g.user_id
         ORDER BY u.created_at DESC
         LIMIT ? OFFSET ?
       `, [limit, offset]),
@@ -54,6 +57,6 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     console.error('Admin users error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
