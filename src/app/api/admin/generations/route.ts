@@ -41,9 +41,15 @@ export async function GET(req: Request) {
       query<any[]>('SELECT COUNT(*) as total FROM generations')
     ]);
 
+    const normalizedGenerations = generations.map((generation) => ({
+      ...generation,
+      id: Number(generation.id),
+      user_id: Number(generation.user_id),
+    }));
+
     return NextResponse.json({ 
-      generations, 
-      total: countResult[0].total,
+      generations: normalizedGenerations, 
+      total: Number(countResult[0].total),
       page,
       limit
     });
